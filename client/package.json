@@ -41,8 +41,18 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.24",
+    "postcss": "^8.4.31",
     "tailwindcss": "^3.3.2"
+  },
+  "overrides": {
+    "nth-check": "^2.1.1",
+    "webpack-dev-server": "^4.15.1",
+    "resolve-url-loader": {
+      "postcss": "^8.4.31"
+    },
+    "@pmmmwh/react-refresh-webpack-plugin": {
+      "webpack-dev-server": "^4.15.1"
+    }
   },
   "proxy": "http://localhost:5000",
   "homepage": "."
