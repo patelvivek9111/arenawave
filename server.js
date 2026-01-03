@@ -94,14 +94,49 @@ const adminRoutes = require('./routes/admin');
 
 // Serve manifest.json explicitly (for Vercel)
 app.get('/manifest.json', (req, res) => {
-  const manifestPath = path.join(__dirname, 'client/build/manifest.json');
-  res.setHeader('Content-Type', 'application/manifest+json');
-  res.sendFile(manifestPath, (err) => {
-    if (err) {
-      console.error('Error serving manifest.json:', err);
-      res.status(404).json({ error: 'Manifest not found' });
+  try {
+    const fs = require('fs');
+    // Try multiple possible paths for Vercel serverless environment
+    const possiblePaths = [
+      path.join(__dirname, 'client/build/manifest.json'),
+      path.join(process.cwd(), 'client/build/manifest.json'),
+      path.join(__dirname, 'manifest.json'),
+      path.join(process.cwd(), 'manifest.json')
+    ];
+    
+    let manifestPath = null;
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        manifestPath = p;
+        break;
+      }
     }
-  });
+    
+    if (!manifestPath) {
+      console.error('manifest.json not found in any expected location');
+      // Return a default manifest as fallback
+      return res.setHeader('Content-Type', 'application/manifest+json').json({
+        short_name: "ArenaWave",
+        name: "ArenaWave E-commerce",
+        icons: [],
+        start_url: ".",
+        display: "standalone",
+        theme_color: "#000000",
+        background_color: "#ffffff"
+      });
+    }
+    
+    res.setHeader('Content-Type', 'application/manifest+json');
+    res.sendFile(manifestPath, (err) => {
+      if (err) {
+        console.error('Error serving manifest.json:', err);
+        res.status(404).json({ error: 'Manifest not found' });
+      }
+    });
+  } catch (error) {
+    console.error('Error in manifest.json route:', error);
+    res.status(500).json({ error: 'Failed to serve manifest' });
+  }
 });
 
 // Routes
