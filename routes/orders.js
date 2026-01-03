@@ -84,28 +84,48 @@ async function ensureMongoConnection() {
 // Create order and generate QR code
 router.post('/create', async (req, res) => {
   try {
+    console.log('=== Order Creation Started ===');
+    console.log('Request body:', JSON.stringify(req.body));
+    console.log('MONGODB_URI set:', !!process.env.MONGODB_URI);
+    console.log('Mongoose readyState:', mongoose.connection.readyState);
+    
     // Ensure MongoDB is connected before proceeding
+    console.log('Step 1: Ensuring MongoDB connection...');
     await ensureMongoConnection();
+    console.log('Step 1: MongoDB connection verified');
 
     const { customer_name, email, phone, quantity } = req.body;
     
+    console.log('Step 2: Validating input...');
     if (!customer_name || !email || !phone || !quantity) {
       return res.status(400).json({ error: 'All fields are required' });
     }
+    console.log('Step 2: Input validated');
 
+    console.log('Step 3: Generating order ID...');
     const order_id = generateOrderId();
     const total_price = quantity * 500; // ₹500 per unit
+    console.log('Step 3: Order ID generated:', order_id);
     
     // Generate QR code data
+    console.log('Step 4: Generating QR code...');
     const qrData = JSON.stringify({
       order_id: order_id,
       type: 'order'
     });
     
     // Generate QR code as data URL
-    const qr_code = await QRCode.toDataURL(qrData);
+    let qr_code;
+    try {
+      qr_code = await QRCode.toDataURL(qrData);
+      console.log('Step 4: QR code generated successfully');
+    } catch (qrError) {
+      console.error('QR code generation error:', qrError);
+      throw new Error(`QR code generation failed: ${qrError.message}`);
+    }
     
     // Create order in database
+    console.log('Step 5: Creating order in database...');
     const order = new Order({
       order_id,
       customer_name,
@@ -116,7 +136,19 @@ router.post('/create', async (req, res) => {
       total_price
     });
     
-    await order.save();
+    try {
+      await order.save();
+      console.log('Step 5: Order saved successfully');
+    } catch (saveError) {
+      console.error('Order save error:', saveError);
+      console.error('Save error details:', {
+        name: saveError.name,
+        message: saveError.message,
+        code: saveError.code,
+        codeName: saveError.codeName
+      });
+      throw saveError;
+    }
     
     // Send email confirmation
     const mailOptions = {
@@ -162,22 +194,31 @@ router.post('/create', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Order creation error:', error);
+    console.error('=== Order Creation Error ===');
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     console.error('Error details:', {
       message: error.message,
       name: error.name,
-      code: error.code
+      code: error.code,
+      codeName: error.codeName,
+      errno: error.errno
     });
+    console.error('Mongoose connection state:', mongoose.connection.readyState);
+    console.error('Mongoose connection error:', mongoose.connection.error);
     
-    // Return more detailed error in development, generic in production
-    const errorMessage = process.env.NODE_ENV === 'production' 
-      ? 'Failed to create order. Please try again.' 
-      : `Failed to create order: ${error.message}`;
-    
+    // Return detailed error for debugging (temporarily in production)
     res.status(500).json({ 
-      error: errorMessage,
-      details: process.env.NODE_ENV !== 'production' ? error.message : undefined
+      error: 'Failed to create order',
+      message: error.message,
+      type: error.constructor.name,
+      code: error.code || error.codeName,
+      // Include connection state for debugging
+      debug: {
+        mongooseState: mongoose.connection.readyState,
+        hasMongoUri: !!process.env.MONGODB_URI
+      }
     });
   }
 });
