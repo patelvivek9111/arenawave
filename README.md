@@ -2,6 +2,8 @@
 
 A complete e-commerce web application for selling FM Radio Earwings used in IPL matches. Built with React frontend, Node.js/Express backend, and MongoDB database.
 
+**Live at:** https://www.arenawav.com
+
 ## Features
 
 ### Customer Features
