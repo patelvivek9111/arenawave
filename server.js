@@ -15,8 +15,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 let mongoServer;
+let isConnected = false;
 
 async function connectDB() {
+  // If already connected, return
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+
   try {
     console.log('Environment variables:');
     console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
@@ -32,6 +38,7 @@ async function connectDB() {
         useUnifiedTopology: true,
       });
       console.log('Connected to MongoDB Atlas');
+      isConnected = true;
     } else {
       // Try to connect to local MongoDB first, fallback to in-memory
       try {
@@ -40,6 +47,7 @@ async function connectDB() {
           useUnifiedTopology: true,
         });
         console.log('Connected to local MongoDB');
+        isConnected = true;
       } catch (localError) {
         console.log('Local MongoDB not available, using in-memory database...');
         mongoServer = await MongoMemoryServer.create();
@@ -49,14 +57,33 @@ async function connectDB() {
           useUnifiedTopology: true,
         });
         console.log('Connected to in-memory MongoDB');
+        isConnected = true;
       }
     }
   } catch (error) {
     console.error('MongoDB connection error:', error);
+    isConnected = false;
   }
 }
 
+// Connect to database
 connectDB();
+
+// Handle connection events
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to MongoDB');
+  isConnected = true;
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('Mongoose connection error:', err);
+  isConnected = false;
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected');
+  isConnected = false;
+});
 
 // Import routes
 const orderRoutes = require('./routes/orders');

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const Checkout = () => {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -28,7 +29,7 @@ const Checkout = () => {
     setError('');
 
     try {
-      const response = await axios.post('/api/order/create', {
+      const response = await axios.post(`${API_BASE_URL}/api/order/create`, {
         ...formData,
         quantity: items[0]?.quantity || 1
       });

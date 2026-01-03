@@ -23,6 +23,22 @@ const transporter = nodemailer.createTransport({
 // Create order and generate QR code
 router.post('/create', async (req, res) => {
   try {
+    // Ensure MongoDB is connected
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      const mongoUri = process.env.MONGODB_URI;
+      if (mongoUri) {
+        try {
+          await mongoose.connect(mongoUri, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+          });
+        } catch (connError) {
+          console.error('Failed to reconnect to MongoDB:', connError);
+        }
+      }
+    }
+
     const { customer_name, email, phone, quantity } = req.body;
     
     if (!customer_name || !email || !phone || !quantity) {
