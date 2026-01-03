@@ -198,8 +198,9 @@ app.post('/api/test/create-order', async (req, res) => {
   }
 });
 
-// Serve static files from React app (only in production)
-if (process.env.NODE_ENV === 'production') {
+// Serve static files from React app (only in production and NOT in Vercel)
+// In Vercel, static files are handled by the filesystem handler in vercel.json
+if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
   app.use(express.static(path.join(__dirname, 'client/build')));
 
   // Catch all handler: send back React's index.html file
