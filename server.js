@@ -99,7 +99,63 @@ app.use('/api/admin', adminRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    mongooseState: mongoose.connection.readyState,
+    hasMongoUri: !!process.env.MONGODB_URI
+  });
+});
+
+// MongoDB connection test endpoint
+app.get('/api/test/mongodb', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const mongoUri = process.env.MONGODB_URI;
+    
+    if (!mongoUri) {
+      return res.status(500).json({ 
+        error: 'MONGODB_URI not set',
+        mongooseState: mongoose.connection.readyState
+      });
+    }
+    
+    // Test connection
+    if (mongoose.connection.readyState === 1) {
+      // Already connected, test with a simple query
+      await mongoose.connection.db.admin().ping();
+      return res.json({ 
+        status: 'Connected',
+        readyState: mongoose.connection.readyState,
+        host: mongoose.connection.host,
+        name: mongoose.connection.name
+      });
+    }
+    
+    // Try to connect
+    await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+    });
+    
+    res.json({ 
+      status: 'Connected successfully',
+      readyState: mongoose.connection.readyState,
+      host: mongoose.connection.host,
+      name: mongoose.connection.name
+    });
+  } catch (error) {
+    console.error('MongoDB test error:', error);
+    res.status(500).json({ 
+      error: 'MongoDB connection failed',
+      message: error.message,
+      name: error.name,
+      code: error.code,
+      mongooseState: mongoose.connection.readyState
+    });
+  }
 });
 
 // Test endpoint to create a sample order
