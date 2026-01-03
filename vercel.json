@@ -20,7 +20,7 @@
     },
     {
       "src": "/manifest.json",
-      "dest": "/api/index.js"
+      "dest": "/api/manifest.json.js"
     },
     {
       "handle": "filesystem"

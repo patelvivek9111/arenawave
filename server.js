@@ -93,50 +93,28 @@ const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 
 // Serve manifest.json explicitly (for Vercel)
+// This route must be defined BEFORE any API routes to avoid conflicts
 app.get('/manifest.json', (req, res) => {
-  try {
-    const fs = require('fs');
-    // Try multiple possible paths for Vercel serverless environment
-    const possiblePaths = [
-      path.join(__dirname, 'client/build/manifest.json'),
-      path.join(process.cwd(), 'client/build/manifest.json'),
-      path.join(__dirname, 'manifest.json'),
-      path.join(process.cwd(), 'manifest.json')
-    ];
-    
-    let manifestPath = null;
-    for (const p of possiblePaths) {
-      if (fs.existsSync(p)) {
-        manifestPath = p;
-        break;
+  // Return manifest JSON directly to avoid filesystem issues in serverless
+  const manifest = {
+    "short_name": "ArenaWave",
+    "name": "ArenaWave E-commerce",
+    "icons": [
+      {
+        "src": "favicon.ico",
+        "sizes": "64x64 32x32 24x24 16x16",
+        "type": "image/x-icon"
       }
-    }
-    
-    if (!manifestPath) {
-      console.error('manifest.json not found in any expected location');
-      // Return a default manifest as fallback
-      return res.setHeader('Content-Type', 'application/manifest+json').json({
-        short_name: "ArenaWave",
-        name: "ArenaWave E-commerce",
-        icons: [],
-        start_url: ".",
-        display: "standalone",
-        theme_color: "#000000",
-        background_color: "#ffffff"
-      });
-    }
-    
-    res.setHeader('Content-Type', 'application/manifest+json');
-    res.sendFile(manifestPath, (err) => {
-      if (err) {
-        console.error('Error serving manifest.json:', err);
-        res.status(404).json({ error: 'Manifest not found' });
-      }
-    });
-  } catch (error) {
-    console.error('Error in manifest.json route:', error);
-    res.status(500).json({ error: 'Failed to serve manifest' });
-  }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
+  };
+  
+  res.setHeader('Content-Type', 'application/manifest+json');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.json(manifest);
 });
 
 // Routes
