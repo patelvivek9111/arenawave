@@ -6,6 +6,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/manifest.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -15,12 +19,12 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
+      "src": "/manifest.json",
+      "dest": "/api/manifest.js"
     },
     {
-      "src": "/manifest.json",
-      "dest": "/api/manifest.json.js"
+      "src": "/api/(?!manifest)(.*)",
+      "dest": "/api/index.js"
     },
     {
       "handle": "filesystem"
