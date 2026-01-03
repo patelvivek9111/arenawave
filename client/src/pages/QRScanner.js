@@ -2,9 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import jsQR from 'jsqr';
-
-// Configure axios base URL
-const API_BASE_URL = 'http://localhost:5000';
+import { API_BASE_URL } from '../config/api';
 
 const QRScanner = () => {
   const [scannedOrder, setScannedOrder] = useState(null);
