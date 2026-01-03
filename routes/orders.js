@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const QRCode = require('qrcode');
 const nodemailer = require('nodemailer');
+const mongoose = require('mongoose');
 const Order = require('../models/Order');
 
 // Generate unique order ID
@@ -20,24 +21,71 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Helper function to ensure MongoDB connection (works for both serverless and traditional servers)
+async function ensureMongoConnection() {
+  // If already connected, return
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+
+  const mongoUri = process.env.MONGODB_URI;
+  
+  if (!mongoUri) {
+    throw new Error('MONGODB_URI environment variable is not set');
+  }
+
+  try {
+    // Check if connection is in progress (state 2 = connecting)
+    if (mongoose.connection.readyState === 2) {
+      // Wait for connection to complete with timeout
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('MongoDB connection timeout'));
+        }, 10000);
+        
+        const onConnected = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+        
+        const onError = (err) => {
+          clearTimeout(timeout);
+          reject(err);
+        };
+        
+        // Check if already connected (race condition)
+        if (mongoose.connection.readyState === 1) {
+          clearTimeout(timeout);
+          resolve();
+          return;
+        }
+        
+        mongoose.connection.once('connected', onConnected);
+        mongoose.connection.once('error', onError);
+      });
+      return;
+    }
+
+    // Connect to MongoDB
+    await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000, // 10 seconds timeout
+      socketTimeoutMS: 45000, // 45 seconds socket timeout
+    });
+    
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw new Error(`Failed to connect to MongoDB: ${error.message}`);
+  }
+}
+
 // Create order and generate QR code
 router.post('/create', async (req, res) => {
   try {
-    // Ensure MongoDB is connected
-    const mongoose = require('mongoose');
-    if (mongoose.connection.readyState !== 1) {
-      const mongoUri = process.env.MONGODB_URI;
-      if (mongoUri) {
-        try {
-          await mongoose.connect(mongoUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-          });
-        } catch (connError) {
-          console.error('Failed to reconnect to MongoDB:', connError);
-        }
-      }
-    }
+    // Ensure MongoDB is connected before proceeding
+    await ensureMongoConnection();
 
     const { customer_name, email, phone, quantity } = req.body;
     
@@ -115,13 +163,29 @@ router.post('/create', async (req, res) => {
     
   } catch (error) {
     console.error('Order creation error:', error);
-    res.status(500).json({ error: 'Failed to create order' });
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      code: error.code
+    });
+    
+    // Return more detailed error in development, generic in production
+    const errorMessage = process.env.NODE_ENV === 'production' 
+      ? 'Failed to create order. Please try again.' 
+      : `Failed to create order: ${error.message}`;
+    
+    res.status(500).json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV !== 'production' ? error.message : undefined
+    });
   }
 });
 
 // Check order status by QR code
 router.post('/fulfill', async (req, res) => {
   try {
+    await ensureMongoConnection();
     const { qrData } = req.body;
     
     if (!qrData) {
@@ -163,6 +227,7 @@ router.post('/fulfill', async (req, res) => {
 // Mark order as fulfilled
 router.put('/fulfill/:orderId', async (req, res) => {
   try {
+    await ensureMongoConnection();
     const { orderId } = req.params;
     const token = req.headers.authorization?.split(' ')[1];
     
@@ -211,6 +276,7 @@ router.put('/fulfill/:orderId', async (req, res) => {
 // Get order status by ID
 router.get('/status/:orderId', async (req, res) => {
   try {
+    await ensureMongoConnection();
     const { orderId } = req.params;
     
     const order = await Order.findOne({ order_id: orderId });
