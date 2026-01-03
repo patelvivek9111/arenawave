@@ -92,6 +92,18 @@ const orderRoutes = require('./routes/orders');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 
+// Serve manifest.json explicitly (for Vercel)
+app.get('/manifest.json', (req, res) => {
+  const manifestPath = path.join(__dirname, 'client/build/manifest.json');
+  res.setHeader('Content-Type', 'application/manifest+json');
+  res.sendFile(manifestPath, (err) => {
+    if (err) {
+      console.error('Error serving manifest.json:', err);
+      res.status(404).json({ error: 'Manifest not found' });
+    }
+  });
+});
+
 // Routes
 app.use('/api/order', orderRoutes);
 app.use('/api/auth', authRoutes);
