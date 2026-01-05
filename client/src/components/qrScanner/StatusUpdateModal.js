@@ -8,7 +8,9 @@ const StatusUpdateModal = ({
   statusNote, 
   setStatusNote, 
   onUpdate, 
-  loading 
+  loading,
+  selectedCounter,
+  orderQuantity
 }) => {
   if (!showModal) return null;
 
@@ -31,6 +33,22 @@ const StatusUpdateModal = ({
               <option value="Cancelled">Cancelled</option>
             </select>
           </div>
+          {newStatus === 'Fulfilled' && (!selectedCounter || (selectedCounter && selectedCounter.current_stock < orderQuantity)) && (
+            <div className={`p-3 rounded-lg ${
+              !selectedCounter 
+                ? 'bg-yellow-50 border border-yellow-200' 
+                : 'bg-red-50 border border-red-200'
+            }`}>
+              <p className={`text-sm ${
+                !selectedCounter ? 'text-yellow-800' : 'text-red-800'
+              }`}>
+                {!selectedCounter 
+                  ? '⚠️ Please select a counter before fulfilling the order.'
+                  : `⚠️ Insufficient stock. Available: ${selectedCounter.current_stock}, Required: ${orderQuantity}`
+                }
+              </p>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Note (Optional)</label>
             <textarea

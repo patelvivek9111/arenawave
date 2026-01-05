@@ -155,7 +155,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Navigation Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <button
             onClick={() => navigate('/admin/orders')}
             className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow text-left group"
@@ -219,6 +219,28 @@ const AdminDashboard = () => {
             </p>
             <span className="text-primary-600 text-sm font-medium group-hover:underline">
               View Employees →
+            </span>
+          </button>
+
+          <button
+            onClick={() => navigate('/admin/counters')}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center mb-4">
+              <div className="p-3 bg-orange-100 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+                Counters
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Manage counters and stock levels. Create counters, restock inventory, and track stock status.
+            </p>
+            <span className="text-primary-600 text-sm font-medium group-hover:underline">
+              View Counters →
             </span>
           </button>
         </div>

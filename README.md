@@ -1,4 +1,4 @@
-# ArenaWave - E-commerce Platform
+`# ArenaWave - E-commerce Platform
 
 A complete e-commerce web application for selling FM Radio Earwings. Built with React frontend, Node.js/Express backend, and MongoDB database.
 
@@ -19,6 +19,11 @@ A complete e-commerce web application for selling FM Radio Earwings. Built with 
 ### Employee Features
 - **Secure Login**: JWT-based authentication system
 - **QR Code Scanner**: Real-time webcam-based QR code scanning
+- **Counter Management**: 
+  - Select counter before fulfilling orders
+  - Real-time stock status display (Good/Low/Critical/Out)
+  - Counter recommendations when stock is low
+  - Restock counters (new stock or transfer from another counter)
 - **Order Search**: Search orders by order ID, customer name, email, or phone
 - **Order Details View**: Complete order information with customer contact details
 - **Order Status Management**: Update status (Pending → Processing → Fulfilled → Cancelled)
@@ -33,6 +38,12 @@ A complete e-commerce web application for selling FM Radio Earwings. Built with 
 
 ### Admin Features
 - **Dashboard Overview**: Statistics cards (Orders, Revenue, Pending, Fulfilled, Customers)
+- **Counter Management**: 
+  - Create and manage multiple counters
+  - Set initial stock and thresholds
+  - Restock counters (new stock or transfer between counters)
+  - View real-time stock status for all counters
+  - Enable/disable counters
 - **Orders Management**: View, search, and filter all orders
 - **Customers Management**: View customer list and order history
 - **Employees Management**: View and manage employee accounts
@@ -41,6 +52,12 @@ A complete e-commerce web application for selling FM Radio Earwings. Built with 
 ### Technical Features
 - **QR Code System**: Unique QR codes per order with email delivery
 - **Email Notifications**: Order confirmations with embedded QR codes
+- **Multi-Counter Inventory Management**: 
+  - Real-time stock tracking per counter
+  - Automatic stock decrement on order fulfillment
+  - Stock transfer between counters
+  - Stock status alerts (Good/Low/Critical/Out)
+  - Counter recommendations for low stock situations
 - **Real-time Status Updates**: Order status tracking with history
 - **Mobile-Optimized UI**: Touch-friendly interface with responsive design
 - **Secure Authentication**: JWT tokens with role-based access control
@@ -94,6 +111,7 @@ ArenaWave/
 │   │   │       ├── IssueFlagModal.js
 │   │   │       ├── OrderDetailsView.js
 │   │   │       ├── QRScannerView.js
+│   │   │       ├── RestockModal.js
 │   │   │       ├── SearchOrdersTab.js
 │   │   │       └── StatusUpdateModal.js
 │   │   │
@@ -114,7 +132,8 @@ ArenaWave/
 │   │   │   ├── AdminDashboard.js # Admin overview
 │   │   │   ├── AdminOrders.js   # Admin orders page
 │   │   │   ├── AdminCustomers.js # Admin customers page
-│   │   │   └── AdminEmployees.js # Admin employees page
+│   │   │   ├── AdminEmployees.js # Admin employees page
+│   │   │   └── AdminCounters.js  # Admin counters page
 │   │   │
 │   │   ├── utils/               # Utility functions
 │   │   │   └── qrScannerUtils.js # QR scanner utilities
@@ -128,12 +147,15 @@ ArenaWave/
 │   └── postcss.config.js        # PostCSS configuration
 │
 ├── models/                       # Database models
-│   └── Order.js                 # Order schema
+│   ├── Order.js                 # Order schema
+│   ├── Counter.js               # Counter schema
+│   └── StockTransaction.js      # Stock transaction log
 │
 ├── routes/                       # API routes
 │   ├── admin.js                 # Admin & employee endpoints
 │   ├── auth.js                  # Authentication routes
-│   └── orders.js                # Order management routes
+│   ├── orders.js                # Order management routes
+│   └── counters.js              # Counter management routes
 │
 ├── .gitignore                   # Git ignore rules
 ├── package.json                 # Backend dependencies
@@ -170,6 +192,14 @@ ArenaWave/
 - `POST /api/admin/employee/order/:orderId/resend-email` - Resend confirmation email
 - `GET /api/admin/employee/order/:orderId/summary` - Get order summary for PDF
 
+### Counter Management Endpoints
+- `GET /api/counters` - Get all counters (Admin & Employee)
+- `GET /api/counters/:counterId` - Get single counter details
+- `POST /api/counters` - Create new counter (Admin only)
+- `PUT /api/counters/:counterId` - Update counter (Admin only)
+- `PUT /api/counters/:counterId/restock` - Restock counter (Admin & Employee)
+- `GET /api/counters/:counterId/recommendations` - Get counter recommendations
+
 ---
 
 ## 💾 Database Schema
@@ -188,6 +218,7 @@ ArenaWave/
   created_at: Date,
   fulfilled_at: Date,
   fulfilled_by: String,
+  fulfilled_at_counter: String (counter_id where order was fulfilled),
   cancelled_at: Date,
   cancelled_by: String,
   has_issue: Boolean (default: false),
@@ -204,6 +235,39 @@ ArenaWave/
     changed_at: Date,
     note: String
   }]
+}
+```
+
+### Counter Model
+```javascript
+{
+  counter_id: String (unique, required),
+  name: String (required, defaults to counter_id),
+  location: String (optional),
+  current_stock: Number (required, min: 0),
+  initial_stock: Number (required),
+  low_stock_threshold: Number (default: 10),
+  critical_stock_threshold: Number (default: 5),
+  is_active: Boolean (default: true),
+  last_restocked_at: Date,
+  created_at: Date,
+  updated_at: Date
+}
+```
+
+### StockTransaction Model
+```javascript
+{
+  counter_id: String (required, ref: 'Counter'),
+  order_id: String (optional, ref: 'Order'),
+  transaction_type: String (enum: 'fulfill', 'restock_from_counter', 'restock_new_batch', 'adjustment'),
+  quantity_change: Number (required, positive for restock, negative for fulfill),
+  quantity_before: Number (required),
+  quantity_after: Number (required),
+  source_counter_id: String (optional, ref: 'Counter'),
+  performed_by: String (required),
+  timestamp: Date (default: Date.now),
+  notes: String (optional)
 }
 ```
 
@@ -281,27 +345,41 @@ ArenaWave/
 ### Employee Journey
 1. Login with employee credentials
 2. Access QR scanner page
-3. **Option A - Scan QR Code:**
+3. **Select Counter:**
+   - Choose counter from dropdown
+   - View real-time stock status
+   - See recommendations if stock is low
+4. **Option A - Scan QR Code:**
    - Start camera
    - Scan customer's QR code
    - View order details
    - Update status, add notes, or flag issues
-   - Mark as fulfilled
-4. **Option B - Search Orders:**
+   - Mark as fulfilled (requires counter selection, decrements stock)
+5. **Option B - Search Orders:**
    - Switch to "Search Orders" tab
    - Search by order ID, name, email, or phone
    - View order details
    - Manage order status and notes
-5. View customer order history
-6. Use quick actions (email, call, resend email, print summary)
+6. **Restock Counter (if needed):**
+   - Click "Restock" button
+   - Add new stock or transfer from another counter
+   - Stock updates in real-time
+7. View customer order history
+8. Use quick actions (email, call, resend email, print summary)
 
 ### Admin Journey
 1. Login with admin credentials
 2. View dashboard with statistics
-3. Navigate to Orders, Customers, or Employees pages
-4. Search and filter data
-5. View detailed information
-6. Manage system data
+3. **Manage Counters:**
+   - Navigate to Counters page
+   - Create new counters with initial stock
+   - Edit counter details and thresholds
+   - Restock counters (new stock or transfer)
+   - View all counters with stock status
+4. Navigate to Orders, Customers, or Employees pages
+5. Search and filter data
+6. View detailed information
+7. Manage system data
 
 ---
 
@@ -344,6 +422,21 @@ ArenaWave/
 - Statistics: total orders, total spent, average order value
 - Status breakdown
 - Click any order to view details
+
+### Multi-Counter Inventory System
+- **Counter Management**: Create and manage multiple counters (e.g., 6 counters in a stadium)
+- **Stock Tracking**: Real-time stock levels per counter with automatic updates
+- **Stock Status Alerts**: 
+  - Good (green): Stock above low threshold
+  - Low (yellow): Stock below low threshold
+  - Critical (orange): Stock below critical threshold
+  - Out (red): No stock available
+- **Stock Operations**:
+  - Restock with new inventory
+  - Transfer stock between counters
+  - Automatic stock decrement on order fulfillment
+- **Counter Recommendations**: When a counter is low/out, system suggests other counters with available stock
+- **Order Fulfillment**: Requires counter selection, validates stock availability, prevents fulfillment if insufficient stock
 
 ---
 

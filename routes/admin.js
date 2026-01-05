@@ -434,17 +434,65 @@ router.get('/employee/order/:orderId', verifyEmployee, async (req, res) => {
 router.put('/employee/order/:orderId/status', verifyEmployee, async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { status, note } = req.body;
+    const { status, note, counter_id } = req.body;
     const username = req.user.username;
     
     if (!status || !['Pending', 'Processing', 'Fulfilled', 'Cancelled'].includes(status)) {
       return res.status(400).json({ error: 'Valid status is required' });
     }
     
+    const Order = require('../models/Order');
+    const Counter = require('../models/Counter');
+    const StockTransaction = require('../models/StockTransaction');
+    
     const order = await Order.findOne({ order_id: orderId });
     
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
+    }
+    
+    // If changing to Fulfilled, require counter_id and handle stock
+    if (status === 'Fulfilled') {
+      if (!counter_id) {
+        return res.status(400).json({ error: 'counter_id is required when fulfilling order' });
+      }
+      
+      const counter = await Counter.findOne({ counter_id });
+      
+      if (!counter) {
+        return res.status(404).json({ error: 'Counter not found' });
+      }
+      
+      if (!counter.is_active) {
+        return res.status(400).json({ error: 'Counter is not active' });
+      }
+      
+      if (!counter.hasEnoughStock(order.quantity)) {
+        return res.status(400).json({ 
+          error: `Insufficient stock. Available: ${counter.current_stock}, Required: ${order.quantity}`,
+          available_stock: counter.current_stock,
+          required_quantity: order.quantity
+        });
+      }
+      
+      // Decrease counter stock
+      const quantity_before = counter.current_stock;
+      await counter.decreaseStock(order.quantity);
+      const quantity_after = counter.current_stock;
+      
+      // Create stock transaction
+      await StockTransaction.create({
+        counter_id: counter_id,
+        order_id: orderId,
+        transaction_type: 'fulfill',
+        quantity_change: -order.quantity,
+        quantity_before: quantity_before,
+        quantity_after: quantity_after,
+        performed_by: username,
+        notes: `Order ${orderId} fulfilled via status update`
+      });
+      
+      order.fulfilled_at_counter = counter_id;
     }
     
     const oldStatus = order.status;
@@ -480,13 +528,14 @@ router.put('/employee/order/:orderId/status', verifyEmployee, async (req, res) =
         status: order.status,
         fulfilled_by: order.fulfilled_by,
         fulfilled_at: order.fulfilled_at,
+        fulfilled_at_counter: order.fulfilled_at_counter,
         cancelled_by: order.cancelled_by,
         cancelled_at: order.cancelled_at
       }
     });
   } catch (error) {
     console.error('Update order status error:', error);
-    res.status(500).json({ error: 'Failed to update order status' });
+    res.status(500).json({ error: error.message || 'Failed to update order status' });
   }
 });
 

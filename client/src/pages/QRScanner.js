@@ -45,6 +45,15 @@ const QRScanner = () => {
   const [customerHistory, setCustomerHistory] = useState(null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  const [counters, setCounters] = useState([]);
+  const [selectedCounter, setSelectedCounter] = useState(null);
+  const [counterRecommendations, setCounterRecommendations] = useState(null);
+  const [showRestockModal, setShowRestockModal] = useState(false);
+  const [restockData, setRestockData] = useState({
+    quantity: '',
+    source_counter_id: '',
+    notes: ''
+  });
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -125,13 +134,32 @@ const QRScanner = () => {
       return;
     }
 
+    loadCounters();
     startCamera();
+
+    // Load saved counter selection from localStorage
+    const savedCounterId = localStorage.getItem('selectedCounterId');
+    if (savedCounterId && counters.length > 0) {
+      const savedCounter = counters.find(c => c.counter_id === savedCounterId);
+      if (savedCounter) {
+        setSelectedCounter(savedCounter);
+      }
+    }
 
     return () => {
       stopCamera();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
+
+  // Load counter recommendations when selected counter changes
+  useEffect(() => {
+    if (selectedCounter) {
+      loadCounterRecommendations(selectedCounter.counter_id);
+    } else {
+      setCounterRecommendations(null);
+    }
+  }, [selectedCounter]);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -237,28 +265,150 @@ const QRScanner = () => {
     }
   };
 
+  const loadCounters = async () => {
+    try {
+      const token = localStorage.getItem('employeeToken');
+      const response = await axios.get(`${API_BASE_URL}/api/counters`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCounters(response.data.counters);
+      
+      // Auto-select first active counter if none selected
+      if (!selectedCounter && response.data.counters.length > 0) {
+        // Check for saved counter first
+        const savedCounterId = localStorage.getItem('selectedCounterId');
+        if (savedCounterId) {
+          const savedCounter = response.data.counters.find(c => c.counter_id === savedCounterId && c.is_active);
+          if (savedCounter) {
+            setSelectedCounter(savedCounter);
+            return;
+          }
+        }
+        // Otherwise select first active counter
+        const firstActive = response.data.counters.find(c => c.is_active) || response.data.counters[0];
+        if (firstActive) {
+          setSelectedCounter(firstActive);
+          localStorage.setItem('selectedCounterId', firstActive.counter_id);
+        }
+      }
+    } catch (error) {
+      console.error('Load counters error:', error);
+    }
+  };
+
+  const loadCounterRecommendations = async (counterId) => {
+    try {
+      const token = localStorage.getItem('employeeToken');
+      const response = await axios.get(`${API_BASE_URL}/api/counters/${counterId}/recommendations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCounterRecommendations(response.data);
+    } catch (error) {
+      console.error('Load recommendations error:', error);
+    }
+  };
+
   const handleFulfillOrder = async () => {
     if (!scannedOrder) return;
+
+    if (!selectedCounter) {
+      setError('Please select a counter before fulfilling the order');
+      return;
+    }
+
+    // Check if counter has enough stock
+    if (selectedCounter.current_stock < scannedOrder.quantity) {
+      setError(`Insufficient stock. Available: ${selectedCounter.current_stock}, Required: ${scannedOrder.quantity}`);
+      return;
+    }
 
     setLoading(true);
     setError('');
     setSuccess('');
 
     try {
-      const response = await axios.put(`${API_BASE_URL}/api/order/fulfill/${scannedOrder.order_id}`, {}, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('employeeToken')}`
+      const response = await axios.put(
+        `${API_BASE_URL}/api/order/fulfill/${scannedOrder.order_id}`,
+        { counter_id: selectedCounter.counter_id },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('employeeToken')}`
+          }
         }
-      });
+      );
 
       if (response.data.success) {
         setSuccess('Order marked as fulfilled successfully!');
+        // Reload counters to update stock
+        await loadCounters();
+        // Update selected counter with new stock
+        if (response.data.counter) {
+          setSelectedCounter(response.data.counter);
+        }
         // Reload order details to get updated status
         await handleViewOrder(scannedOrder.order_id);
       }
     } catch (error) {
       console.error('Fulfillment error:', error);
       setError(error.response?.data?.error || 'Failed to fulfill order');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRestockCounter = async (e) => {
+    e.preventDefault();
+    if (!selectedCounter) return;
+
+    if (!restockData.source_counter_id) {
+      setError('Please select a source for the stock');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const token = localStorage.getItem('employeeToken');
+      const restockPayload = {
+        quantity: parseInt(restockData.quantity),
+        notes: restockData.notes || null
+      };
+      
+      // If "new_stock" is selected, don't send source_counter_id
+      if (restockData.source_counter_id && restockData.source_counter_id !== 'new_stock') {
+        restockPayload.source_counter_id = restockData.source_counter_id;
+      }
+
+      const response = await axios.put(
+        `${API_BASE_URL}/api/counters/${selectedCounter.counter_id}/restock`,
+        restockPayload,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data.success) {
+        setSuccess(restockData.source_counter_id && restockData.source_counter_id !== 'new_stock'
+          ? 'Stock transferred successfully!'
+          : 'Counter restocked successfully!');
+        setShowRestockModal(false);
+        setRestockData({
+          quantity: '',
+          source_counter_id: '',
+          notes: ''
+        });
+        // Reload counters
+        await loadCounters();
+        // Update selected counter
+        if (response.data.counter) {
+          setSelectedCounter(response.data.counter);
+        }
+      }
+    } catch (error) {
+      console.error('Restock error:', error);
+      setError(error.response?.data?.error || 'Failed to restock counter');
     } finally {
       setLoading(false);
     }
@@ -314,15 +464,38 @@ const QRScanner = () => {
   const handleUpdateStatus = async () => {
     if (!scannedOrder || !newStatus) return;
 
+    // If changing to Fulfilled, require counter selection
+    if (newStatus === 'Fulfilled' && !selectedCounter) {
+      setError('Please select a counter before fulfilling the order');
+      setLoading(false);
+      return;
+    }
+
+    // Check stock if fulfilling
+    if (newStatus === 'Fulfilled' && selectedCounter) {
+      if (selectedCounter.current_stock < scannedOrder.quantity) {
+        setError(`Insufficient stock. Available: ${selectedCounter.current_stock}, Required: ${scannedOrder.quantity}`);
+        setLoading(false);
+        return;
+      }
+    }
+
     setLoading(true);
     setError('');
     setSuccess('');
 
     try {
       const token = localStorage.getItem('employeeToken');
+      const payload = { status: newStatus, note: statusNote };
+      
+      // Include counter_id if fulfilling
+      if (newStatus === 'Fulfilled' && selectedCounter) {
+        payload.counter_id = selectedCounter.counter_id;
+      }
+
       const response = await axios.put(
         `${API_BASE_URL}/api/admin/employee/order/${scannedOrder.order_id}/status`,
-        { status: newStatus, note: statusNote },
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -331,6 +504,14 @@ const QRScanner = () => {
         setShowStatusModal(false);
         setNewStatus('');
         setStatusNote('');
+        // Reload counters to update stock if fulfilling
+        if (newStatus === 'Fulfilled') {
+          await loadCounters();
+          // Update selected counter if response includes counter data
+          if (response.data.counter) {
+            setSelectedCounter(response.data.counter);
+          }
+        }
         // Reload order details
         await handleViewOrder(scannedOrder.order_id);
       }
@@ -680,15 +861,54 @@ const QRScanner = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex justify-between items-center py-3 sm:py-4">
-            <p className="text-sm sm:text-base text-gray-700">
-              Welcome, {employeeUser.username} ({employeeUser.role})
-            </p>
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 py-2">
+            <div className="flex-1 flex justify-center sm:justify-start">
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-gray-700 mb-1">
+                  Welcome, {employeeUser.username} ({employeeUser.role})
+                </p>
+                {/* Counter Selection */}
+                <div className="flex flex-col sm:flex-row gap-1.5 sm:items-center justify-center sm:justify-start">
+                  <label className="text-xs text-gray-600 font-medium">Counter:</label>
+                <select
+                  value={selectedCounter?.counter_id || ''}
+                  onChange={(e) => {
+                    const counter = counters.find(c => c.counter_id === e.target.value);
+                    setSelectedCounter(counter || null);
+                    // Save to localStorage for persistence
+                    if (counter) {
+                      localStorage.setItem('selectedCounterId', counter.counter_id);
+                    } else {
+                      localStorage.removeItem('selectedCounterId');
+                    }
+                  }}
+                    className="px-2 py-1 min-h-[40px] border border-gray-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                  >
+                    <option value="">Select Counter</option>
+                    {counters
+                      .filter(c => c.is_active)
+                      .map(counter => (
+                        <option key={counter.counter_id} value={counter.counter_id}>
+                          {counter.name} ({counter.current_stock} units)
+                        </option>
+                      ))}
+                  </select>
+                  {selectedCounter && (
+                    <button
+                      onClick={() => setShowRestockModal(true)}
+                      className="px-2.5 py-1 min-h-[40px] bg-green-600 text-white rounded text-xs sm:text-sm font-medium hover:bg-green-700 transition duration-300"
+                    >
+                      Restock
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5">
               {employeeUser.role === 'admin' && (
                 <button
                   onClick={() => navigate('/admin/dashboard')}
-                  className="bg-blue-600 text-white px-3 sm:px-4 py-2 min-h-[44px] rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition duration-300"
+                  className="bg-blue-600 text-white px-2.5 sm:px-3 py-1.5 min-h-[40px] rounded text-xs sm:text-sm font-medium hover:bg-blue-700 transition duration-300"
                   title="Admin Dashboard"
                 >
                   Admin Dashboard
@@ -696,10 +916,10 @@ const QRScanner = () => {
               )}
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition duration-300"
+                className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition duration-300"
                 title="Logout"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
               </button>
@@ -707,6 +927,79 @@ const QRScanner = () => {
           </div>
         </div>
       </div>
+
+      {/* Counter Stock Status & Recommendations */}
+      {selectedCounter && (
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-2">
+          <div className={`rounded-lg p-2 sm:p-2.5 border-2 ${
+            selectedCounter.stock_status === 'good' ? 'bg-green-50 border-green-300' :
+            selectedCounter.stock_status === 'low' ? 'bg-yellow-50 border-yellow-300' :
+            selectedCounter.stock_status === 'critical' ? 'bg-orange-50 border-orange-300' :
+            'bg-red-50 border-red-300'
+          }`}>
+            <div className="flex flex-col gap-2">
+              {/* Main Counter Info */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded ${
+                    selectedCounter.stock_status === 'good' ? 'bg-green-100' :
+                    selectedCounter.stock_status === 'low' ? 'bg-yellow-100' :
+                    selectedCounter.stock_status === 'critical' ? 'bg-orange-100' :
+                    'bg-red-100'
+                  }`}>
+                    <span className={`text-sm sm:text-base font-bold ${
+                      selectedCounter.stock_status === 'good' ? 'text-green-800' :
+                      selectedCounter.stock_status === 'low' ? 'text-yellow-800' :
+                      selectedCounter.stock_status === 'critical' ? 'text-orange-800' :
+                      'text-red-800'
+                    }`}>
+                      Counter {selectedCounter.counter_id}
+                    </span>
+                    <span className={`text-sm sm:text-base font-semibold ${
+                      selectedCounter.stock_status === 'good' ? 'text-green-700' :
+                      selectedCounter.stock_status === 'low' ? 'text-yellow-700' :
+                      selectedCounter.stock_status === 'critical' ? 'text-orange-700' :
+                      'text-red-700'
+                    }`}>
+                      {selectedCounter.current_stock}
+                    </span>
+                    <span className={`text-xs sm:text-sm font-medium ${
+                      selectedCounter.stock_status === 'good' ? 'text-green-600' :
+                      selectedCounter.stock_status === 'low' ? 'text-yellow-600' :
+                      selectedCounter.stock_status === 'critical' ? 'text-orange-600' :
+                      'text-red-600'
+                    }`}>
+                      units
+                    </span>
+                  </div>
+                  <span className={`px-2 py-1 rounded text-xs font-bold border ${
+                    selectedCounter.stock_status === 'good' ? 'bg-green-200 text-green-800 border-green-300' :
+                    selectedCounter.stock_status === 'low' ? 'bg-yellow-200 text-yellow-800 border-yellow-300' :
+                    selectedCounter.stock_status === 'critical' ? 'bg-orange-200 text-orange-800 border-orange-300' :
+                    'bg-red-200 text-red-800 border-red-300'
+                  }`}>
+                    {selectedCounter.stock_status.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Recommendations */}
+              {(selectedCounter.stock_status === 'low' || selectedCounter.stock_status === 'critical' || selectedCounter.stock_status === 'out') && counterRecommendations && counterRecommendations.recommendations.length > 0 && (
+                <div className="pt-1.5 border-t border-gray-200">
+                  <p className="text-xs font-semibold text-gray-700 mb-1">Recommended Counters:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {counterRecommendations.recommendations.slice(0, 3).map(rec => (
+                      <span key={rec.counter_id} className="px-2 py-1 bg-white rounded border border-gray-300 text-xs text-gray-700 font-medium">
+                        Counter {rec.counter_id} ({rec.current_stock} units)
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 md:py-8">
         {/* Tabs */}
@@ -830,6 +1123,8 @@ const QRScanner = () => {
         setStatusNote={setStatusNote}
         onUpdate={handleUpdateStatus}
         loading={loading}
+        selectedCounter={selectedCounter}
+        orderQuantity={scannedOrder?.quantity}
       />
 
       <AddNoteModal
@@ -870,6 +1165,82 @@ const QRScanner = () => {
         onToggle={handleToggleIssue}
         loading={loading}
       />
+
+      {/* Restock Modal */}
+      {showRestockModal && selectedCounter && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Restock Counter: {selectedCounter.name}</h2>
+            <form onSubmit={handleRestockCounter} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={restockData.quantity}
+                  onChange={(e) => setRestockData({ ...restockData, quantity: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-h-[44px]"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Source *</label>
+                <select
+                  value={restockData.source_counter_id}
+                  onChange={(e) => setRestockData({ ...restockData, source_counter_id: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-h-[44px]"
+                  required
+                >
+                  <option value="">Select Source</option>
+                  <option value="new_stock">New Stock (Brand new inventory)</option>
+                  {counters
+                    .filter(c => c.counter_id !== selectedCounter.counter_id && c.is_active && c.current_stock > 0)
+                    .map(counter => (
+                      <option key={counter.counter_id} value={counter.counter_id}>
+                        {counter.name} ({counter.current_stock} available)
+                      </option>
+                    ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select "New Stock" to add brand new inventory, or select a counter to transfer stock from.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                <textarea
+                  value={restockData.notes}
+                  onChange={(e) => setRestockData({ ...restockData, notes: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                  rows="3"
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-green-600 text-white py-2 min-h-[44px] rounded-lg text-sm font-medium hover:bg-green-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Processing...' : (restockData.source_counter_id ? 'Transfer Stock' : 'Restock Counter')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowRestockModal(false);
+                    setRestockData({
+                      quantity: '',
+                      source_counter_id: '',
+                      notes: ''
+                    });
+                  }}
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 min-h-[44px] rounded-lg text-sm font-medium hover:bg-gray-400 transition duration-300"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

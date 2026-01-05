@@ -270,15 +270,24 @@ router.put('/fulfill/:orderId', async (req, res) => {
   try {
     await ensureMongoConnection();
     const { orderId } = req.params;
+    const { counter_id } = req.body;
     const token = req.headers.authorization?.split(' ')[1];
     
     if (!token) {
       return res.status(401).json({ error: 'No token provided' });
     }
 
+    if (!counter_id) {
+      return res.status(400).json({ error: 'counter_id is required' });
+    }
+
     // Verify token and get employee info
     const jwt = require('jsonwebtoken');
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawave-secret-key');
+    
+    const Order = require('../models/Order');
+    const Counter = require('../models/Counter');
+    const StockTransaction = require('../models/StockTransaction');
     
     const order = await Order.findOne({ order_id: orderId });
     
@@ -290,10 +299,48 @@ router.put('/fulfill/:orderId', async (req, res) => {
       return res.status(400).json({ error: 'Order already fulfilled' });
     }
     
+    // Get counter and check stock
+    const counter = await Counter.findOne({ counter_id });
+    
+    if (!counter) {
+      return res.status(404).json({ error: 'Counter not found' });
+    }
+    
+    if (!counter.is_active) {
+      return res.status(400).json({ error: 'Counter is not active' });
+    }
+    
+    if (!counter.hasEnoughStock(order.quantity)) {
+      return res.status(400).json({ 
+        error: `Insufficient stock. Available: ${counter.current_stock}, Required: ${order.quantity}`,
+        available_stock: counter.current_stock,
+        required_quantity: order.quantity
+      });
+    }
+    
+    // Decrease counter stock
+    const quantity_before = counter.current_stock;
+    await counter.decreaseStock(order.quantity);
+    const quantity_after = counter.current_stock;
+    
+    // Update order
     order.status = 'Fulfilled';
     order.fulfilled_by = decoded.username;
     order.fulfilled_at = new Date();
+    order.fulfilled_at_counter = counter_id;
     await order.save();
+    
+    // Create stock transaction
+    await StockTransaction.create({
+      counter_id: counter_id,
+      order_id: orderId,
+      transaction_type: 'fulfill',
+      quantity_change: -order.quantity,
+      quantity_before: quantity_before,
+      quantity_after: quantity_after,
+      performed_by: decoded.username,
+      notes: `Order ${orderId} fulfilled`
+    });
     
     res.json({
       success: true,
@@ -304,13 +351,20 @@ router.put('/fulfill/:orderId', async (req, res) => {
         quantity: order.quantity,
         status: order.status,
         fulfilled_by: order.fulfilled_by,
-        fulfilled_at: order.fulfilled_at
+        fulfilled_at: order.fulfilled_at,
+        fulfilled_at_counter: order.fulfilled_at_counter
+      },
+      counter: {
+        counter_id: counter.counter_id,
+        name: counter.name,
+        current_stock: counter.current_stock,
+        stock_status: counter.stock_status
       }
     });
     
   } catch (error) {
     console.error('Order fulfillment error:', error);
-    res.status(500).json({ error: 'Failed to fulfill order' });
+    res.status(500).json({ error: error.message || 'Failed to fulfill order' });
   }
 });
 

@@ -41,6 +41,11 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  fulfilled_at_counter: {
+    type: String,
+    default: null,
+    ref: 'Counter'
+  },
   cancelled_by: {
     type: String,
     default: null

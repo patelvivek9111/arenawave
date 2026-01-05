@@ -91,6 +91,7 @@ mongoose.connection.on('disconnected', () => {
 const orderRoutes = require('./routes/orders');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const counterRoutes = require('./routes/counters');
 
 // Serve manifest.json explicitly (for Vercel)
 // This route must be defined BEFORE any API routes to avoid conflicts
@@ -121,6 +122,7 @@ app.get('/manifest.json', (req, res) => {
 app.use('/api/order', orderRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/counters', counterRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
