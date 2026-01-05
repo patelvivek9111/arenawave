@@ -4,7 +4,6 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
 
 const AdminDashboard = () => {
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [stats, setStats] = useState({
     totalOrders: 0,
@@ -25,7 +24,6 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   const loadDashboardData = async () => {
-    setLoading(true);
     setError('');
 
     try {
@@ -39,8 +37,6 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Dashboard data loading error:', error);
       setError('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
     }
   };
 
