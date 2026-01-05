@@ -143,14 +143,6 @@ const EmployeeLogin = () => {
               )}
             </button>
           </div>
-
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">Test Credentials:</h3>
-            <div className="text-xs text-gray-600 space-y-1">
-              <p><strong>Employee:</strong> employee1 / password123</p>
-              <p><strong>Admin:</strong> admin1 / password123</p>
-            </div>
-          </div>
         </form>
       </div>
     </div>
