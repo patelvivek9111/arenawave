@@ -27,11 +27,11 @@ const Cart = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
                 </svg>
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
-              <p className="text-gray-600 mb-8 text-lg">Add some products to your cart to get started.</p>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
+              <p className="text-gray-600 mb-8 text-sm">Add some products to your cart to get started.</p>
               <button
                 onClick={() => navigate('/shop')}
-                className="btn-primary text-lg px-8 py-4 group"
+                className="btn-primary text-sm px-8 py-4 group"
               >
                 <span className="flex items-center justify-center">
                   Continue Shopping
@@ -48,61 +48,61 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 py-6 md:py-8 lg:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 py-4 sm:py-6 md:py-8 lg:py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 md:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <div className="mb-6 sm:mb-8 md:mb-12">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">
             Shopping <span className="gradient-text">Cart</span>
           </h1>
-          <p className="text-lg text-gray-600">{items.length} item(s) in your cart</p>
+          <p className="text-xs sm:text-sm text-gray-600">{items.length} item(s) in your cart</p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8 md:gap-12">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-12">
           {/* Cart Items */}
           <div className="lg:col-span-2">
             <div className="card overflow-hidden">
               {items.map((item, index) => (
-                <div key={item.id} className={`p-6 md:p-8 ${index !== items.length - 1 ? 'border-b border-gray-100' : ''}`}>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <div key={item.id} className={`p-4 sm:p-6 md:p-8 ${index !== items.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                  <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-6">
                     {/* Product Image */}
-                    <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-4 rounded-2xl">
+                    <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-3 sm:p-4 rounded-2xl flex-shrink-0">
                       <img 
                         src={item.image} 
                         alt={item.name} 
-                        className="w-20 h-20 md:w-24 md:h-24 object-contain rounded-xl"
+                        className="w-20 h-20 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain rounded-xl mx-auto sm:mx-0"
                       />
                     </div>
                     
                     {/* Product Details */}
-                    <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
+                    <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-4 w-full sm:w-auto">
+                      <div className="flex-1 min-w-0 text-center sm:text-left">
+                        <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-1 sm:mb-2">
                           {item.name}
                         </h3>
-                        <p className="text-lg font-semibold gradient-text">₹{item.price}</p>
+                        <p className="text-sm sm:text-base font-semibold gradient-text">₹{item.price}</p>
                       </div>
 
                       {/* Quantity Controls */}
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center justify-center space-x-2 sm:space-x-3">
                         <button
                           onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                           disabled={item.quantity <= 1}
-                          className="w-10 h-10 rounded-lg border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:border-primary-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                          className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:border-primary-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active:scale-95"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                           </svg>
                         </button>
                         
-                        <span className="w-16 h-10 border-2 border-gray-300 rounded-lg flex items-center justify-center text-lg font-bold text-gray-900 bg-gray-50">
+                        <span className="w-16 h-11 min-h-[44px] border-2 border-gray-300 rounded-lg flex items-center justify-center text-sm sm:text-base font-bold text-gray-900 bg-gray-50">
                           {item.quantity}
                         </span>
                         
                         <button
                           onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                           disabled={item.quantity >= 10}
-                          className="w-10 h-10 rounded-lg border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:border-primary-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                          className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:border-primary-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active:scale-95"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -111,8 +111,8 @@ const Cart = () => {
                       </div>
 
                       {/* Price */}
-                      <div className="text-right">
-                        <p className="text-xl md:text-2xl font-bold gradient-text">
+                      <div className="text-center sm:text-right sm:text-left sm:min-w-[80px]">
+                        <p className="text-base sm:text-lg md:text-xl font-bold gradient-text">
                           ₹{item.price * item.quantity}
                         </p>
                       </div>
@@ -123,10 +123,10 @@ const Cart = () => {
             </div>
 
             {/* Clear Cart Button */}
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <button
                 onClick={clearCart}
-                className="text-red-600 hover:text-red-700 text-base font-medium flex items-center transition-all duration-300 hover:scale-105"
+                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center min-h-[44px] transition-all duration-300 hover:scale-105"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -138,8 +138,8 @@ const Cart = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="card p-6 md:p-8 sticky top-4">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
+            <div className="card p-4 sm:p-6 md:p-8 sticky top-4">
+              <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Order Summary</h2>
               
               <div className="space-y-4 mb-6">
                 {items.map((item) => (
@@ -156,14 +156,14 @@ const Cart = () => {
 
               <div className="border-t-2 border-gray-100 pt-6 mb-8">
                 <div className="flex justify-between items-center">
-                  <span className="text-xl md:text-2xl font-bold text-gray-900">Total</span>
-                  <span className="text-3xl md:text-4xl font-bold gradient-text">₹{getTotalPrice()}</span>
+                  <span className="text-lg md:text-xl font-bold text-gray-900">Total</span>
+                  <span className="text-2xl md:text-3xl font-bold gradient-text">₹{getTotalPrice()}</span>
                 </div>
               </div>
 
               <button
                 onClick={handleCheckout}
-                className="w-full btn-primary text-lg py-4 px-8 mb-6 group"
+                className="w-full btn-primary text-sm py-4 px-8 mb-6 group"
               >
                 <span className="flex items-center justify-center">
                   <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +179,7 @@ const Cart = () => {
               <div className="text-center">
                 <button
                   onClick={() => navigate('/shop')}
-                  className="text-primary-600 hover:text-primary-700 text-base font-medium transition-all duration-300 hover:scale-105"
+                  className="text-primary-600 hover:text-primary-700 text-sm font-medium transition-all duration-300 hover:scale-105"
                 >
                   Continue Shopping
                 </button>

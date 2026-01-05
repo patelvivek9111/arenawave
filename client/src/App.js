@@ -9,6 +9,9 @@ import Confirmation from './pages/Confirmation';
 import EmployeeLogin from './pages/EmployeeLogin';
 import QRScanner from './pages/QRScanner';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminOrders from './pages/AdminOrders';
+import AdminCustomers from './pages/AdminCustomers';
+import AdminEmployees from './pages/AdminEmployees';
 import { CartProvider } from './context/CartContext';
 
 function App() {
@@ -33,6 +36,9 @@ function App() {
               <Route path="/employee/login" element={<EmployeeLogin />} />
               <Route path="/employee/scanner" element={<QRScanner />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+              <Route path="/admin/customers" element={<AdminCustomers />} />
+              <Route path="/admin/employees" element={<AdminEmployees />} />
             </Routes>
           </main>
         </div>

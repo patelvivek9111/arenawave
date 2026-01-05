@@ -30,7 +30,7 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Fulfilled'],
+    enum: ['Pending', 'Processing', 'Fulfilled', 'Cancelled'],
     default: 'Pending'
   },
   fulfilled_by: {
@@ -41,6 +41,58 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  cancelled_by: {
+    type: String,
+    default: null
+  },
+  cancelled_at: {
+    type: Date,
+    default: null
+  },
+  has_issue: {
+    type: Boolean,
+    default: false
+  },
+  issue_description: {
+    type: String,
+    default: null
+  },
+  notes: [{
+    note: {
+      type: String,
+      required: true
+    },
+    added_by: {
+      type: String,
+      required: true
+    },
+    added_at: {
+      type: Date,
+      default: Date.now
+    },
+    is_internal: {
+      type: Boolean,
+      default: true
+    }
+  }],
+  status_history: [{
+    status: {
+      type: String,
+      required: true
+    },
+    changed_by: {
+      type: String,
+      required: true
+    },
+    changed_at: {
+      type: Date,
+      default: Date.now
+    },
+    note: {
+      type: String,
+      default: null
+    }
+  }],
   total_price: {
     type: Number,
     required: true
