@@ -351,6 +351,38 @@ button:focus, input:focus, textarea:focus, select:focus {
   }
 }
 
+/*
+ * Mobile base layer sets animation-duration: 0.01ms on * (performance).
+ * Restore About-page story rail / kicker / card entrance — higher specificity + !important.
+ * Scoped with prefers-reduced-motion so accessibility stays intact.
+ */
+@media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
+  .aw-story-rail-glow {
+    animation-name: aw-story-rail-sweep !important;
+    animation-duration: 2.6s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-fill-mode: none !important;
+  }
+
+  .aw-story-kicker {
+    animation-name: aw-story-kicker-glow !important;
+    animation-duration: 3.6s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-fill-mode: none !important;
+  }
+
+  .aw-story-card {
+    animation-name: aw-story-card-in !important;
+    animation-duration: 0.75s !important;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+    animation-fill-mode: both !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: var(--aw-story-delay, 0ms) !important;
+  }
+}
+
 /* Any live event — bounce in from a side (top / bottom / left / right) */
 @keyframes aw-usecase-drop-top {
   0% {

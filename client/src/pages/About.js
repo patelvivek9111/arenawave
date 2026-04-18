@@ -316,102 +316,31 @@ export default function About() {
 
           <Reveal className="mt-10">
             <div className="space-y-5 text-zinc-700 font-light leading-relaxed text-base md:text-lg">
-              <p>It started on April 20, 2016.</p>
+              <p>ArenaWav started from a real experience.</p>
               <p>
-                At a packed stadium, watching the Mumbai Indians vs Royal Challengers Bangalore 2016, surrounded by thousands of fans—the
-                energy was incredible.
+                In 2016, I was at a packed stadium watching a live game. The energy was incredible, but I couldn&apos;t fully understand what
+                was happening during key moments because there was no real-time commentary.
               </p>
-              <p>The noise. The atmosphere. The moment.</p>
-              <p>But something was missing.</p>
-              <p>I couldn&apos;t hear the commentary. I didn&apos;t know the context behind key plays.</p>
-              <p>I tried to stream it on my phone.</p>
-              <p>It didn&apos;t work.</p>
-              <p>The network was overloaded. The experience broke.</p>
-              <p>And in that moment, something became clear:</p>
-              <p>Watching from home felt more informative than being there.</p>
-              <p>At home, you hear every detail. Every play is explained. Every moment has meaning.</p>
-              <p>In the stadium, you feel the game—but you don&apos;t fully understand it.</p>
-              <p>And fans are forced to choose:</p>
-              <p>energy, or insight.</p>
-            </div>
-          </Reveal>
-
-          <Reveal className="mt-12">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">That Tradeoff Shouldn&apos;t Exist</h2>
-            <div className="mt-5 space-y-5 text-zinc-700 font-light leading-relaxed text-base md:text-lg">
-              <p>Live sports should be the best way to experience the game. Not a compromise.</p>
-              <p>That moment in 2016 planted a simple idea:</p>
               <p>
-                What if every fan could hear the game—in real time, without delay—without relying on the internet?
+                I tried streaming it on my phone, but the network was overloaded and delayed. It made me realize something simple: watching
+                from home was actually more informative than being there.
               </p>
-              <p>No buffering. No distractions. No screens. Just the game, enhanced.</p>
-            </div>
-          </Reveal>
-
-          <Reveal className="mt-12">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">From Idea to Reality</h2>
-            <div className="mt-6 relative space-y-6 pl-6 sm:pl-8">
-              <div className="aw-story-rail absolute left-0 top-0 bottom-0 w-px bg-zinc-200" aria-hidden>
-                <span className="aw-story-rail-glow block w-px h-24 bg-zinc-900/60" />
-              </div>
-              <article className="aw-story-card rounded-2xl border border-zinc-200 bg-white p-5" style={{ '--aw-story-delay': '0ms' }}>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">2016 — The Spark</p>
-                <p className="mt-2 text-zinc-700 font-light leading-relaxed">
-                  The idea was born inside a packed stadium—when the limitations of connectivity made it impossible to access live commentary.
-                </p>
-              </article>
-              <article className="aw-story-card rounded-2xl border border-zinc-200 bg-white p-5" style={{ '--aw-story-delay': '90ms' }}>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">2020 — The Question</p>
-                <p className="mt-2 text-zinc-700 font-light leading-relaxed">During the COVID period, the idea resurfaced. This time, it became something to explore.</p>
-                <p className="mt-2 text-zinc-700 font-light leading-relaxed">Would fans actually want this?</p>
-                <p className="mt-2 text-zinc-700 font-light leading-relaxed">
-                  After speaking with people across different sports communities, the response was overwhelming: Fans didn&apos;t just like the
-                  idea—they expected it.
-                </p>
-              </article>
-              <article className="aw-story-card rounded-2xl border border-zinc-200 bg-white p-5" style={{ '--aw-story-delay': '180ms' }}>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">2021–2023 — Exploration</p>
-                <p className="mt-2 text-zinc-700 font-light leading-relaxed">The concept evolved through research and iteration.</p>
-                <p className="mt-2 text-zinc-700 font-light leading-relaxed">The focus became clear:</p>
-                <ul className="mt-2 list-disc pl-6 space-y-1 text-zinc-700 font-light">
-                  <li>Must work at stadium scale</li>
-                  <li>Must be instant and reliable</li>
-                  <li>Must feel effortless for fans</li>
-                </ul>
-              </article>
-              <article className="aw-story-card rounded-2xl border border-zinc-200 bg-white p-5" style={{ '--aw-story-delay': '270ms' }}>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">2024 — Building Begins</p>
-                <p className="mt-2 text-zinc-700 font-light leading-relaxed">
-                  From concept to reality, development started. Hardware, transmission, and user experience—all designed around one goal:
-                  Seamless audio for every fan.
-                </p>
-              </article>
-              <article className="aw-story-card rounded-2xl border border-zinc-200 bg-white p-5" style={{ '--aw-story-delay': '360ms' }}>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">2026 — First Prototype</p>
-                <p className="mt-2 text-zinc-700 font-light leading-relaxed">
-                  The first working prototype is now complete. A step toward redefining how fans experience live events—bringing real-time audio
-                  to every seat in the stadium.
-                </p>
-              </article>
-            </div>
-          </Reveal>
-
-          <Reveal className="mt-12">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">Reimagining the Stadium Experience</h2>
-            <div className="mt-5 space-y-5 text-zinc-700 font-light leading-relaxed text-base md:text-lg">
-              <p>Arenawav was built to bridge that gap.</p>
-              <p>To bring the clarity of broadcast into the energy of the stadium.</p>
+              <p>That tradeoff didn&apos;t make sense.</p>
               <p>
-                So every fan, in every seat, can hear every play, understand every moment, and feel more connected to the game than ever before.
+                Over the years, the idea stayed with me. During COVID, I revisited it more seriously and started validating whether others
+                felt the same. After speaking with hundreds of sports fans across different events, the pattern was clear: people loved the
+                stadium experience, but felt they were missing context.
+              </p>
+              <p>That&apos;s when I started building ArenaWav.</p>
+              <p>
+                Since then, I&apos;ve focused on solving this problem from the ground up, designing hardware, iterating through multiple
+                prototypes, and learning what it takes to deliver reliable, real-time audio at stadium scale.
+              </p>
+              <p>
+                ArenaWav is built to bring the clarity of broadcast into the energy of the stadium, so fans don&apos;t have to choose between
+                feeling the game and understanding it.
               </p>
             </div>
-          </Reveal>
-
-          <Reveal className="mt-12">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">This Isn&apos;t Just About Audio</h2>
-            <p className="mt-5 text-zinc-700 font-light leading-relaxed text-base md:text-lg">
-              It&apos;s about redefining what it means to be there.
-            </p>
           </Reveal>
         </div>
       </section>
