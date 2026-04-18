@@ -10,8 +10,20 @@ import { HowItWorksFlowConnector, HowItWorksStepArt } from '../components/howItW
 import ProductPixelReveal from '../components/ProductPixelReveal';
 import HeroPixelBackdrop from '../components/HeroPixelBackdrop';
 
+/**
+ * Root-relative URL for a file in `public/`. With `homepage: "."`, CRA sets
+ * `PUBLIC_URL` to `"."`, which produced `./hero-venue.jpg` — that resolves to
+ * `/about/hero-venue.jpg` on routes like `/about/` and the image 404s on production.
+ */
+function publicPath(file) {
+  const name = file.replace(/^\//, '');
+  const base = process.env.PUBLIC_URL || '';
+  if (!base || base === '.') return `/${name}`;
+  return `${base.replace(/\/$/, '')}/${name}`;
+}
+
 /** Same-origin so CSP / third-party blocks on production cannot strip the hero photo */
-const HERO_BG = `${process.env.PUBLIC_URL || ''}/hero-venue.jpg`;
+const HERO_BG = publicPath('hero-venue.jpg');
 
 const USE_CASES = [
   {
