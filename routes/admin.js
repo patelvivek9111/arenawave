@@ -2,6 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 
+function orderTotalEmailLabel(order) {
+  const c = order.currency || 'USD';
+  if (c === 'INR') {
+    return `₹${order.total_price.toLocaleString('en-IN')} INR`;
+  }
+  return `$${order.total_price} USD`;
+}
+
 // Middleware to verify admin role
 const verifyAdmin = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -62,6 +70,7 @@ router.get('/orders', verifyAdmin, async (req, res) => {
         phone: order.phone,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency: order.currency || 'USD',
         status: order.status,
         fulfilled_by: order.fulfilled_by,
         fulfilled_at: order.fulfilled_at,
@@ -182,6 +191,7 @@ router.get('/search', verifyAdmin, async (req, res) => {
         order_id: order.order_id,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency: order.currency || 'USD',
         status: order.status,
         created_at: order.created_at,
         fulfilled_at: order.fulfilled_at
@@ -202,6 +212,7 @@ router.get('/search', verifyAdmin, async (req, res) => {
         phone: order.phone,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency: order.currency || 'USD',
         status: order.status,
         fulfilled_by: order.fulfilled_by,
         fulfilled_at: order.fulfilled_at,
@@ -251,6 +262,7 @@ router.get('/customer/:email/orders', verifyAdmin, async (req, res) => {
         phone: order.phone,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency: order.currency || 'USD',
         status: order.status,
         fulfilled_by: order.fulfilled_by,
         fulfilled_at: order.fulfilled_at,
@@ -293,6 +305,7 @@ router.get('/employee/search', verifyEmployee, async (req, res) => {
         phone: order.phone,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency: order.currency || 'USD',
         status: order.status,
         fulfilled_by: order.fulfilled_by,
         fulfilled_at: order.fulfilled_at,
@@ -359,6 +372,12 @@ router.get('/employee/customer/:email/orders', verifyEmployee, async (req, res) 
       statusBreakdown[order.status] = (statusBreakdown[order.status] || 0) + 1;
     });
 
+    const totalSpentByCurrency = orders.reduce((acc, o) => {
+      const c = o.currency || 'USD';
+      acc[c] = (acc[c] || 0) + o.total_price;
+      return acc;
+    }, {});
+
     res.json({
       success: true,
       customer,
@@ -369,6 +388,7 @@ router.get('/employee/customer/:email/orders', verifyEmployee, async (req, res) 
         phone: order.phone,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency: order.currency || 'USD',
         status: order.status,
         fulfilled_by: order.fulfilled_by,
         fulfilled_at: order.fulfilled_at,
@@ -379,6 +399,7 @@ router.get('/employee/customer/:email/orders', verifyEmployee, async (req, res) 
       stats: {
         totalOrders: orders.length,
         totalSpent,
+        totalSpentByCurrency,
         averageOrderValue: Math.round(averageOrderValue * 100) / 100,
         mostCommonQuantity: parseInt(mostCommonQuantity),
         statusBreakdown
@@ -411,6 +432,8 @@ router.get('/employee/order/:orderId', verifyEmployee, async (req, res) => {
         address: order.address,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency: order.currency || 'USD',
+        pricing_region: order.pricing_region || 'north_america',
         status: order.status,
         fulfilled_by: order.fulfilled_by,
         fulfilled_at: order.fulfilled_at,
@@ -650,7 +673,7 @@ router.post('/employee/order/:orderId/resend-email', verifyEmployee, async (req,
     const mailOptions = {
       from: 'noreply@arenawave.com',
       to: order.email,
-      subject: 'Order Confirmation - FM Radio Earwing (Resent)',
+      subject: 'Order Confirmation - ArenaWave Earwing (Resent)',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">Order Confirmation</h2>
@@ -659,9 +682,9 @@ router.post('/employee/order/:orderId/resend-email', verifyEmployee, async (req,
           <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>Order Details:</h3>
             <p><strong>Order ID:</strong> ${order.order_id}</p>
-            <p><strong>Product:</strong> FM Radio Earwing</p>
+            <p><strong>Product:</strong> ArenaWave Earwing</p>
             <p><strong>Quantity:</strong> ${order.quantity}</p>
-            <p><strong>Total Amount:</strong> ₹${order.total_price}</p>
+            <p><strong>Total Amount:</strong> ${orderTotalEmailLabel(order)}</p>
             <p><strong>Status:</strong> ${order.status}</p>
           </div>
           <p>Please present this QR code to collect your order:</p>
@@ -697,6 +720,11 @@ router.get('/employee/order/:orderId/summary', verifyEmployee, async (req, res) 
       return res.status(404).json({ error: 'Order not found' });
     }
 
+    const currency = order.currency || 'USD';
+    const unit_price = order.quantity
+      ? Math.round(order.total_price / order.quantity)
+      : order.total_price;
+
     res.json({
       success: true,
       summary: {
@@ -706,11 +734,12 @@ router.get('/employee/order/:orderId/summary', verifyEmployee, async (req, res) 
         phone: order.phone,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency,
         status: order.status,
         created_at: order.created_at,
         fulfilled_at: order.fulfilled_at,
-        product: 'FM Radio Earwing',
-        unit_price: 500
+        product: 'ArenaWave Earwing',
+        unit_price
       }
     });
   } catch (error) {
@@ -723,14 +752,18 @@ router.get('/employee/order/:orderId/summary', verifyEmployee, async (req, res) 
 router.get('/stats', verifyAdmin, async (req, res) => {
   try {
     const totalOrders = await Order.countDocuments();
-    const totalRevenue = await Order.aggregate([
+    const revenueByCurrency = await Order.aggregate([
       {
         $group: {
-          _id: null,
+          _id: { $ifNull: ['$currency', 'USD'] },
           total: { $sum: '$total_price' }
         }
       }
     ]);
+    const revenueUSD =
+      revenueByCurrency.find((r) => r._id === 'USD')?.total || 0;
+    const revenueINR =
+      revenueByCurrency.find((r) => r._id === 'INR')?.total || 0;
     
     const pendingOrders = await Order.countDocuments({ status: 'Pending' });
     const fulfilledOrders = await Order.countDocuments({ status: 'Fulfilled' });
@@ -741,7 +774,8 @@ router.get('/stats', verifyAdmin, async (req, res) => {
       success: true,
       stats: {
         totalOrders,
-        totalRevenue: totalRevenue[0]?.total || 0,
+        revenueUSD,
+        revenueINR,
         pendingOrders,
         fulfilledOrders,
         totalCustomers: uniqueCustomers

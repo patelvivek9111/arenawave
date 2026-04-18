@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import jsQR from 'jsqr';
 import { API_BASE_URL } from '../config/api';
+import { formatMoney } from '../config/pricing';
 import StatusUpdateModal from '../components/qrScanner/StatusUpdateModal';
 import AddNoteModal from '../components/qrScanner/AddNoteModal';
 import IssueFlagModal from '../components/qrScanner/IssueFlagModal';
@@ -772,10 +773,10 @@ const QRScanner = () => {
                 </div>
                 <div class="info-row">
                   <span class="info-label">Unit Price:</span>
-                  <span class="info-value">₹${summary.unit_price}</span>
+                  <span class="info-value">${formatMoney(summary.unit_price, summary.currency || 'USD')}</span>
                 </div>
                 <div class="total">
-                  Total Amount: ₹${summary.total_price}
+                  Total Amount: ${formatMoney(summary.total_price, summary.currency || 'USD')}
                 </div>
               </div>
 
@@ -857,19 +858,19 @@ const QRScanner = () => {
   const employeeUser = JSON.parse(localStorage.getItem('employeeUser') || '{}');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white border-b border-zinc-100">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 py-2">
             <div className="flex-1 flex justify-center sm:justify-start">
               <div className="text-center sm:text-left">
-                <p className="text-xs sm:text-sm text-gray-700 mb-1">
+                <p className="text-xs sm:text-sm text-zinc-700 mb-1">
                   Welcome, {employeeUser.username} ({employeeUser.role})
                 </p>
                 {/* Counter Selection */}
                 <div className="flex flex-col sm:flex-row gap-1.5 sm:items-center justify-center sm:justify-start">
-                  <label className="text-xs text-gray-600 font-medium">Counter:</label>
+                  <label className="text-xs text-zinc-600 font-medium">Counter:</label>
                 <select
                   value={selectedCounter?.counter_id || ''}
                   onChange={(e) => {
@@ -882,7 +883,7 @@ const QRScanner = () => {
                       localStorage.removeItem('selectedCounterId');
                     }
                   }}
-                    className="px-2 py-1 min-h-[40px] border border-gray-300 rounded text-xs sm:text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                    className="px-2 py-1 min-h-[40px] border border-zinc-200 rounded text-xs sm:text-sm focus:ring-2 focus:ring-zinc-300 focus:border-zinc-300 bg-white"
                   >
                     <option value="">Select Counter</option>
                     {counters
@@ -896,7 +897,7 @@ const QRScanner = () => {
                   {selectedCounter && (
                     <button
                       onClick={() => setShowRestockModal(true)}
-                      className="px-2.5 py-1 min-h-[40px] bg-green-600 text-white rounded text-xs sm:text-sm font-medium hover:bg-green-700 transition duration-300"
+                      className="px-2.5 py-1 min-h-[40px] bg-zinc-900 text-white rounded text-xs sm:text-sm font-medium hover:bg-zinc-800 transition duration-300"
                     >
                       Restock
                     </button>
@@ -908,7 +909,7 @@ const QRScanner = () => {
               {employeeUser.role === 'admin' && (
                 <button
                   onClick={() => navigate('/admin/dashboard')}
-                  className="bg-blue-600 text-white px-2.5 sm:px-3 py-1.5 min-h-[40px] rounded text-xs sm:text-sm font-medium hover:bg-blue-700 transition duration-300"
+                  className="bg-zinc-900 text-white px-2.5 sm:px-3 py-1.5 min-h-[40px] rounded text-xs sm:text-sm font-medium hover:bg-zinc-800 transition duration-300"
                   title="Admin Dashboard"
                 >
                   Admin Dashboard
@@ -916,7 +917,7 @@ const QRScanner = () => {
               )}
               <button
                 onClick={handleLogout}
-                className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition duration-300"
+                className="p-1.5 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded transition duration-300"
                 title="Logout"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -985,11 +986,11 @@ const QRScanner = () => {
               
               {/* Recommendations */}
               {(selectedCounter.stock_status === 'low' || selectedCounter.stock_status === 'critical' || selectedCounter.stock_status === 'out') && counterRecommendations && counterRecommendations.recommendations.length > 0 && (
-                <div className="pt-1.5 border-t border-gray-200">
-                  <p className="text-xs font-semibold text-gray-700 mb-1">Recommended Counters:</p>
+                <div className="pt-1.5 border-t border-zinc-200">
+                  <p className="text-xs font-semibold text-zinc-700 mb-1">Recommended Counters:</p>
                   <div className="flex flex-wrap gap-1.5">
                     {counterRecommendations.recommendations.slice(0, 3).map(rec => (
-                      <span key={rec.counter_id} className="px-2 py-1 bg-white rounded border border-gray-300 text-xs text-gray-700 font-medium">
+                      <span key={rec.counter_id} className="px-2 py-1 bg-white rounded border border-zinc-300 text-xs text-zinc-700 font-medium">
                         Counter {rec.counter_id} ({rec.current_stock} units)
                       </span>
                     ))}
@@ -1005,7 +1006,7 @@ const QRScanner = () => {
         {/* Tabs */}
         {!scannedOrder && (
           <div className="mb-4 sm:mb-6">
-            <div className="bg-white rounded-lg shadow-sm p-1 flex gap-2">
+            <div className="bg-white rounded-xl border border-zinc-100 shadow-sm p-1 flex gap-2">
               <button
                 onClick={() => {
                   setActiveTab('scan');
@@ -1026,8 +1027,8 @@ const QRScanner = () => {
                 }}
                 className={`flex-1 px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
                   activeTab === 'scan'
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-zinc-900 text-white'
+                    : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
                 }`}
               >
                 Scan QR Code
@@ -1042,8 +1043,8 @@ const QRScanner = () => {
                 }}
                 className={`flex-1 px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
                   activeTab === 'search'
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-zinc-900 text-white'
+                    : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
                 }`}
               >
                 Search Orders
@@ -1169,26 +1170,26 @@ const QRScanner = () => {
       {/* Restock Modal */}
       {showRestockModal && selectedCounter && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Restock Counter: {selectedCounter.name}</h2>
+          <div className="bg-white rounded-2xl border border-zinc-100 shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold text-zinc-900 mb-4">Restock Counter: {selectedCounter.name}</h2>
             <form onSubmit={handleRestockCounter} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Quantity *</label>
                 <input
                   type="number"
                   min="1"
                   value={restockData.quantity}
                   onChange={(e) => setRestockData({ ...restockData, quantity: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-h-[44px]"
+                  className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-zinc-300 focus:border-zinc-300 text-sm min-h-[44px]"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Source *</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Source *</label>
                 <select
                   value={restockData.source_counter_id}
                   onChange={(e) => setRestockData({ ...restockData, source_counter_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm min-h-[44px]"
+                  className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-zinc-300 focus:border-zinc-300 text-sm min-h-[44px]"
                   required
                 >
                   <option value="">Select Source</option>
@@ -1201,16 +1202,16 @@ const QRScanner = () => {
                       </option>
                     ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-zinc-500 mt-1">
                   Select "New Stock" to add brand new inventory, or select a counter to transfer stock from.
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Notes (Optional)</label>
                 <textarea
                   value={restockData.notes}
                   onChange={(e) => setRestockData({ ...restockData, notes: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-zinc-300 focus:border-zinc-300 text-sm"
                   rows="3"
                 />
               </div>
@@ -1218,7 +1219,7 @@ const QRScanner = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-green-600 text-white py-2 min-h-[44px] rounded-lg text-sm font-medium hover:bg-green-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-zinc-900 text-white py-2 min-h-[44px] rounded-lg text-sm font-medium hover:bg-zinc-800 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Processing...' : (restockData.source_counter_id ? 'Transfer Stock' : 'Restock Counter')}
                 </button>
@@ -1232,7 +1233,7 @@ const QRScanner = () => {
                       notes: ''
                     });
                   }}
-                  className="flex-1 bg-gray-300 text-gray-700 py-2 min-h-[44px] rounded-lg text-sm font-medium hover:bg-gray-400 transition duration-300"
+                  className="flex-1 bg-zinc-100 text-zinc-700 py-2 min-h-[44px] rounded-lg text-sm font-medium hover:bg-zinc-200 transition duration-300"
                 >
                   Cancel
                 </button>

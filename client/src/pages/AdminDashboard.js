@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
+import { formatMoney } from '../config/pricing';
 
 const AdminDashboard = () => {
   const [error, setError] = useState('');
   const [stats, setStats] = useState({
     totalOrders: 0,
-    totalRevenue: 0,
+    revenueUSD: 0,
+    revenueINR: 0,
     pendingOrders: 0,
     fulfilledOrders: 0,
     totalCustomers: 0
@@ -106,7 +108,14 @@ const AdminDashboard = () => {
               </div>
               <div className="ml-2 sm:ml-4 flex-1 min-w-0">
                 <p className="text-xs font-medium text-gray-600 truncate">Revenue</p>
-                <p className="text-lg sm:text-xl font-bold text-gray-900">₹{stats.totalRevenue.toLocaleString()}</p>
+                <p className="text-sm sm:text-lg font-bold text-gray-900 leading-tight">
+                  {formatMoney(stats.revenueUSD || 0, 'USD')}
+                  {(stats.revenueINR || 0) > 0 && (
+                    <span className="block text-xs sm:text-sm font-semibold text-gray-700 mt-1">
+                      {formatMoney(stats.revenueINR, 'INR')}
+                    </span>
+                  )}
+                </p>
               </div>
             </div>
           </div>

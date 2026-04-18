@@ -1,6 +1,6 @@
 `# ArenaWave - E-commerce Platform
 
-A complete e-commerce web application for selling FM Radio Earwings. Built with React frontend, Node.js/Express backend, and MongoDB database.
+A web application for ArenaWave — in-venue live audio for stadiums and large events — including e-commerce for the Earwing receiver. Built with React frontend, Node.js/Express backend, and MongoDB database.
 
 **🌐 Live Website:** https://www.arenawav.com
 

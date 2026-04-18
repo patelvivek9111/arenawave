@@ -63,24 +63,24 @@ const EmployeeLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-6 sm:py-8 md:py-12 px-3 sm:px-4 lg:px-8">
+    <div className="min-h-screen bg-white flex items-center justify-center py-6 sm:py-8 md:py-12 px-3 sm:px-4 lg:px-8">
       <div className="max-w-md w-full space-y-6 sm:space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100">
-            <svg className="h-8 w-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="rounded-2xl border border-zinc-100 bg-white shadow-sm p-6 sm:p-8">
+          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-zinc-50 border border-zinc-100">
+            <svg className="h-8 w-8 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h2 className="mt-6 text-center text-2xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-2xl font-semibold tracking-tight text-zinc-900">
             Employee Login
           </h2>
-          <p className="mt-2 text-center text-xs text-gray-600">
+          <p className="mt-2 text-center text-xs text-zinc-600 font-light">
             Access the QR scanner to fulfill orders
           </p>
-        </div>
+        
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="rounded-xl shadow-sm -space-y-px">
             <div>
               <label htmlFor="username" className="sr-only">
                 Username
@@ -92,7 +92,7 @@ const EmployeeLogin = () => {
                 required
                 value={formData.username}
                 onChange={handleInputChange}
-                className="appearance-none rounded-none relative block w-full px-3 py-3 min-h-[44px] border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-3 min-h-[44px] border border-zinc-200 placeholder-zinc-400 text-zinc-900 rounded-t-xl focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-300 focus:z-10 text-sm"
                 placeholder="Username"
               />
             </div>
@@ -107,7 +107,7 @@ const EmployeeLogin = () => {
                 required
                 value={formData.password}
                 onChange={handleInputChange}
-                className="appearance-none rounded-none relative block w-full px-3 py-3 min-h-[44px] border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-3 min-h-[44px] border border-zinc-200 placeholder-zinc-400 text-zinc-900 rounded-b-xl focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-300 focus:z-10 text-sm"
                 placeholder="Password"
               />
             </div>
@@ -128,7 +128,7 @@ const EmployeeLogin = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 min-h-[44px] border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 min-h-[48px] border border-transparent text-sm font-medium rounded-full text-white bg-zinc-950 hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
                 <>
@@ -144,6 +144,7 @@ const EmployeeLogin = () => {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

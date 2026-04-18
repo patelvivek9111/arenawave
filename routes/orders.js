@@ -94,17 +94,30 @@ router.post('/create', async (req, res) => {
     await ensureMongoConnection();
     console.log('Step 1: MongoDB connection verified');
 
-    const { customer_name, email, phone, quantity } = req.body;
-    
+    const { customer_name, email, phone, quantity, pricing_region } = req.body;
+
+    const REGION_PRICING = {
+      north_america: { unitPrice: 20, currency: 'USD' },
+      india: { unitPrice: 1000, currency: 'INR' },
+    };
+
     console.log('Step 2: Validating input...');
     if (!customer_name || !email || !phone || !quantity) {
       return res.status(400).json({ error: 'All fields are required' });
+    }
+    if (!pricing_region || !REGION_PRICING[pricing_region]) {
+      return res.status(400).json({ error: 'Valid pricing_region is required (north_america or india)' });
     }
     console.log('Step 2: Input validated');
 
     console.log('Step 3: Generating order ID...');
     const order_id = generateOrderId();
-    const total_price = quantity * 500; // ₹500 per unit
+    const { unitPrice, currency } = REGION_PRICING[pricing_region];
+    const total_price = quantity * unitPrice;
+    const totalLabel =
+      currency === 'INR'
+        ? `₹${total_price.toLocaleString('en-IN')} INR`
+        : `$${total_price} USD`;
     console.log('Step 3: Order ID generated:', order_id);
     
     // Generate QR code data
@@ -133,7 +146,9 @@ router.post('/create', async (req, res) => {
       phone,
       quantity,
       qr_code,
-      total_price
+      total_price,
+      currency,
+      pricing_region,
     });
     
     try {
@@ -154,7 +169,7 @@ router.post('/create', async (req, res) => {
     const mailOptions = {
       from: 'noreply@arenawave.com',
       to: email,
-      subject: 'Order Confirmation - FM Radio Earwing',
+      subject: 'Order Confirmation - ArenaWave Earwing',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">Order Confirmation</h2>
@@ -163,9 +178,9 @@ router.post('/create', async (req, res) => {
           <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>Order Details:</h3>
             <p><strong>Order ID:</strong> ${order_id}</p>
-            <p><strong>Product:</strong> FM Radio Earwing</p>
+            <p><strong>Product:</strong> ArenaWave Earwing</p>
             <p><strong>Quantity:</strong> ${quantity}</p>
-            <p><strong>Total Amount:</strong> ₹${total_price}</p>
+            <p><strong>Total Amount:</strong> ${totalLabel}</p>
           </div>
           <p>Please present this QR code to collect your order:</p>
           <img src="${qr_code}" alt="QR Code" style="max-width: 200px; display: block; margin: 20px auto;">
@@ -189,7 +204,9 @@ router.post('/create', async (req, res) => {
         phone,
         quantity,
         total_price,
-        qr_code
+        currency,
+        pricing_region,
+        qr_code,
       }
     });
     
@@ -255,7 +272,8 @@ router.post('/fulfill', async (req, res) => {
         phone: order.phone,
         quantity: order.quantity,
         total_price: order.total_price,
-        status: order.status
+        currency: order.currency || 'USD',
+        status: order.status,
       }
     });
     
@@ -389,8 +407,9 @@ router.get('/status/:orderId', async (req, res) => {
         phone: order.phone,
         quantity: order.quantity,
         total_price: order.total_price,
+        currency: order.currency || 'USD',
         status: order.status,
-        created_at: order.created_at
+        created_at: order.created_at,
       }
     });
     

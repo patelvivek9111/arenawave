@@ -5,7 +5,7 @@ module.exports = (req, res) => {
   
   const manifest = {
     "short_name": "ArenaWave",
-    "name": "ArenaWave E-commerce",
+    "name": "ArenaWave — In-venue live audio",
     "icons": [
       {
         "src": "favicon.ico",

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
+import { formatOrderMoney, summarizeTotalsByCurrency } from '../utils/orderMoney';
 
 const AdminCustomers = () => {
   const [customers, setCustomers] = useState([]);
@@ -184,7 +185,12 @@ const AdminCustomers = () => {
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-gray-500 mb-1">Total Spent</p>
-                  <p className="text-sm sm:text-base font-bold text-primary-600">₹{selectedCustomer.totalSpent}</p>
+                  <p className="text-sm sm:text-base font-bold text-primary-600">
+                    {(() => {
+                      const s = summarizeTotalsByCurrency(customerOrders);
+                      return s.single || (s.multi && s.multi.join(' · '));
+                    })()}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-gray-500 mb-1">Last Order</p>
@@ -212,7 +218,9 @@ const AdminCustomers = () => {
                               </div>
                               <div>
                                 <p className="text-gray-500">Amount</p>
-                                <p className="text-gray-900 font-bold">₹{order.total_price}</p>
+                                <p className="text-gray-900 font-bold">
+                                  {formatOrderMoney(order.total_price, order.currency)}
+                                </p>
                               </div>
                               <div>
                                 <p className="text-gray-500">Status</p>
@@ -285,7 +293,11 @@ const AdminCustomers = () => {
                               </div>
                               <div>
                                 <p className="text-gray-500">Total Spent</p>
-                                <p className="text-gray-900 font-bold text-primary-600">₹{customer.totalSpent}</p>
+                                <p className="text-gray-900 font-bold text-primary-600">
+                                  {customer.totalSpent != null
+                                    ? customer.totalSpent.toLocaleString()
+                                    : '0'}
+                                </p>
                               </div>
                             </div>
                             <p className="text-xs text-gray-500 mt-2">

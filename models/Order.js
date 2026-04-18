@@ -102,6 +102,16 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  currency: {
+    type: String,
+    enum: ['USD', 'INR'],
+    default: 'USD'
+  },
+  pricing_region: {
+    type: String,
+    enum: ['north_america', 'india'],
+    default: 'north_america'
+  },
   created_at: {
     type: Date,
     default: Date.now

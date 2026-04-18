@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
+import { formatOrderMoney } from '../utils/orderMoney';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -219,7 +220,9 @@ const AdminOrders = () => {
                           </div>
                           <div>
                             <p className="text-gray-500 mb-1">Amount</p>
-                            <p className="text-gray-900 font-bold">₹{order.total_price}</p>
+                            <p className="text-gray-900 font-bold">
+                              {formatOrderMoney(order.total_price, order.currency)}
+                            </p>
                           </div>
                         </div>
 

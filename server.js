@@ -4,6 +4,10 @@ const cors = require('cors');
 const path = require('path');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 require('dotenv').config();
+// Force local/in-memory DB when Atlas URI is wrong or DNS-blocked (dev only).
+if (process.env.USE_IN_MEMORY_DB === '1' || process.env.USE_IN_MEMORY_DB === 'true') {
+  delete process.env.MONGODB_URI;
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,6 +21,25 @@ app.use(express.urlencoded({ extended: true }));
 let mongoServer;
 let isConnected = false;
 
+const mongooseOpts = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
+
+async function connectLocalOrMemory() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/arenawave', mongooseOpts);
+    console.log('Connected to local MongoDB');
+    isConnected = true;
+  } catch {
+    console.log('Local MongoDB not available, using in-memory database...');
+    mongoServer = await MongoMemoryServer.create();
+    await mongoose.connect(mongoServer.getUri(), mongooseOpts);
+    console.log('Connected to in-memory MongoDB');
+    isConnected = true;
+  }
+}
+
 async function connectDB() {
   // If already connected, return
   if (mongoose.connection.readyState === 1) {
@@ -27,40 +50,32 @@ async function connectDB() {
     console.log('Environment variables:');
     console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
     console.log('NODE_ENV:', process.env.NODE_ENV);
-    
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/arenawave';
-    
-    // If MONGODB_URI is set, use it (Atlas or local)
+
     if (process.env.MONGODB_URI) {
-      console.log('Attempting to connect to MongoDB Atlas...');
-      await mongoose.connect(process.env.MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        serverSelectionTimeoutMS: 10000, // 10 seconds timeout
-        socketTimeoutMS: 45000, // 45 seconds socket timeout
-      });
-      console.log('Connected to MongoDB Atlas');
-      isConnected = true;
-    } else {
-      // Try to connect to local MongoDB first, fallback to in-memory
+      console.log('Attempting to connect using MONGODB_URI...');
       try {
-        await mongoose.connect('mongodb://localhost:27017/arenawave', {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
+        await mongoose.connect(process.env.MONGODB_URI, {
+          ...mongooseOpts,
+          serverSelectionTimeoutMS: 10000,
+          socketTimeoutMS: 45000,
         });
-        console.log('Connected to local MongoDB');
+        console.log('Connected to MongoDB');
         isConnected = true;
-      } catch (localError) {
-        console.log('Local MongoDB not available, using in-memory database...');
-        mongoServer = await MongoMemoryServer.create();
-        const mongoUri = mongoServer.getUri();
-        await mongoose.connect(mongoUri, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        });
-        console.log('Connected to in-memory MongoDB');
-        isConnected = true;
+      } catch (remoteError) {
+        const allowDevFallback = process.env.NODE_ENV !== 'production';
+        if (!allowDevFallback) {
+          throw remoteError;
+        }
+        console.warn(
+          'Configured MongoDB unreachable (e.g. DNS/network). Falling back to local or in-memory (development only).'
+        );
+        if (mongoose.connection.readyState !== 0) {
+          await mongoose.disconnect();
+        }
+        await connectLocalOrMemory();
       }
+    } else {
+      await connectLocalOrMemory();
     }
   } catch (error) {
     console.error('MongoDB connection error:', error);
@@ -206,7 +221,9 @@ app.post('/api/test/create-order', async (req, res) => {
       phone: '1234567890',
       quantity: 1,
       qr_code,
-      total_price: 500
+      total_price: 20,
+      currency: 'USD',
+      pricing_region: 'north_america'
     });
     
     await order.save();
@@ -241,7 +258,17 @@ module.exports = app;
 
 // Only start server if not in Vercel environment
 if (process.env.VERCEL !== '1') {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+  });
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(
+        `Port ${PORT} is already in use. Close the other app (often another "npm run dev") or set PORT in .env to a free port.`
+      );
+      console.error(`Find PID: Get-NetTCPConnection -LocalPort ${PORT} | Select-Object OwningProcess`);
+      process.exit(1);
+    }
+    throw err;
   });
 }

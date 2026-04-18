@@ -11,10 +11,10 @@ const QRScannerView = ({
 }) => {
   return (
     <div className="max-w-2xl mx-auto w-full">
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl sm:rounded-2xl shadow-xl overflow-hidden">
-        <div className="bg-white/80 backdrop-blur-sm px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-gray-200">
-          <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 text-center flex items-center justify-center gap-2">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="bg-white border border-zinc-100 rounded-xl sm:rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-zinc-100">
+          <h2 className="text-base sm:text-lg md:text-xl font-bold text-zinc-900 text-center flex items-center justify-center gap-2">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
             </svg>
             Scan QR Code
@@ -32,7 +32,7 @@ const QRScannerView = ({
               </div>
               <button
                 onClick={onStartCamera}
-                className="bg-blue-600 text-white px-6 py-3 min-h-[44px] rounded-xl font-medium hover:bg-blue-700 transition duration-300 shadow-lg hover:shadow-xl"
+                className="bg-zinc-900 text-white px-6 py-3 min-h-[44px] rounded-xl font-medium hover:bg-zinc-800 transition duration-300 shadow-sm"
               >
                 Retry Camera
               </button>
@@ -78,16 +78,16 @@ const QRScannerView = ({
                     }}
                   >
                     {/* Outer frame - responsive size */}
-                    <div className="absolute inset-0 border-3 sm:border-4 border-primary-400 rounded-xl sm:rounded-2xl shadow-2xl"></div>
+                    <div className="absolute inset-0 border-3 sm:border-4 border-zinc-300 rounded-xl sm:rounded-2xl shadow-2xl"></div>
                     
                     {/* Corner decorations - responsive size */}
-                    <div className="absolute -top-0.5 -left-0.5 sm:-top-1 sm:-left-1 w-8 h-8 sm:w-12 sm:h-12 border-t-3 sm:border-t-4 border-l-3 sm:border-l-4 border-primary-500 rounded-tl-xl sm:rounded-tl-2xl"></div>
-                    <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-8 h-8 sm:w-12 sm:h-12 border-t-3 sm:border-t-4 border-r-3 sm:border-r-4 border-primary-500 rounded-tr-xl sm:rounded-tr-2xl"></div>
-                    <div className="absolute -bottom-0.5 -left-0.5 sm:-bottom-1 sm:-left-1 w-8 h-8 sm:w-12 sm:h-12 border-b-3 sm:border-b-4 border-l-3 sm:border-l-4 border-primary-500 rounded-bl-xl sm:rounded-bl-2xl"></div>
-                    <div className="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-8 h-8 sm:w-12 sm:h-12 border-b-3 sm:border-b-4 border-r-3 sm:border-r-4 border-primary-500 rounded-br-xl sm:rounded-br-2xl"></div>
+                    <div className="absolute -top-0.5 -left-0.5 sm:-top-1 sm:-left-1 w-8 h-8 sm:w-12 sm:h-12 border-t-3 sm:border-t-4 border-l-3 sm:border-l-4 border-zinc-900 rounded-tl-xl sm:rounded-tl-2xl"></div>
+                    <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-8 h-8 sm:w-12 sm:h-12 border-t-3 sm:border-t-4 border-r-3 sm:border-r-4 border-zinc-900 rounded-tr-xl sm:rounded-tr-2xl"></div>
+                    <div className="absolute -bottom-0.5 -left-0.5 sm:-bottom-1 sm:-left-1 w-8 h-8 sm:w-12 sm:h-12 border-b-3 sm:border-b-4 border-l-3 sm:border-l-4 border-zinc-900 rounded-bl-xl sm:rounded-bl-2xl"></div>
+                    <div className="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-8 h-8 sm:w-12 sm:h-12 border-b-3 sm:border-b-4 border-r-3 sm:border-r-4 border-zinc-900 rounded-br-xl sm:rounded-br-2xl"></div>
                     
                     {/* Scanning line animation */}
-                    <div className="absolute top-0 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-transparent via-primary-400 to-transparent animate-pulse"></div>
+                    <div className="absolute top-0 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-transparent via-zinc-500 to-transparent animate-pulse"></div>
                   </div>
                 )}
                 
@@ -102,7 +102,7 @@ const QRScannerView = ({
                     ? 'bg-green-50 border-green-200'
                     : scanStatus.includes('error') || scanStatus.includes('Error')
                     ? 'bg-red-50 border-red-200'
-                    : 'bg-blue-50 border-blue-200'
+                    : 'bg-zinc-50 border-zinc-200'
                 }`}>
                   <div className="flex items-center justify-center gap-2 sm:gap-3">
                     {scanStatus.includes('detected') || scanStatus.includes('Processing') ? (
@@ -114,7 +114,7 @@ const QRScannerView = ({
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                       </svg>
                     ) : (
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 animate-pulse flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-700 animate-pulse flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                       </svg>
                     )}
@@ -123,7 +123,7 @@ const QRScannerView = ({
                         ? 'text-green-700'
                         : scanStatus.includes('error') || scanStatus.includes('Error')
                         ? 'text-red-700'
-                        : 'text-blue-700'
+                        : 'text-zinc-700'
                     }`}>
                       {scanStatus}
                     </p>
@@ -136,7 +136,7 @@ const QRScannerView = ({
                   className={`w-full py-3 sm:py-3.5 px-4 sm:px-6 min-h-[48px] sm:min-h-[50px] rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition-all duration-300 shadow-lg active:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 ${
                     isScanning 
                       ? 'bg-gradient-to-r from-red-600 to-red-700 text-white active:from-red-700 active:to-red-800' 
-                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white active:from-blue-700 active:to-indigo-700'
+                      : 'bg-zinc-900 text-white hover:bg-zinc-800'
                   }`}
                 >
                   {isScanning ? (
@@ -158,7 +158,7 @@ const QRScannerView = ({
                 </button>
                 
                 {/* Helper Text */}
-                <p className="text-xs text-gray-500 text-center mt-1 sm:mt-2 px-2">
+                <p className="text-xs text-zinc-500 text-center mt-1 sm:mt-2 px-2">
                   {/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? (
                     <span className="flex items-center justify-center gap-1.5">
                       <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

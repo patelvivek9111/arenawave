@@ -1,7 +1,7 @@
 {
   "name": "arenawave-ecommerce",
   "version": "1.0.0",
-  "description": "FM Radio Earwing E-commerce Platform",
+  "description": "ArenaWave — in-venue synchronized live audio for stadiums and large events",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

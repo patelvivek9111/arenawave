@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,7 +15,7 @@
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #fafafa;
+    background-color: #fafaf9;
     overflow-x: hidden; /* Prevent horizontal scroll */
     font-size: 16px; /* Base font size for better mobile readability */
     line-height: 1.5; /* Improved line height for readability */
@@ -141,10 +141,53 @@
   background: linear-gradient(135deg, #0284c7, #c026d3);
 }
 
-/* Firefox scrollbar */
+/* Firefox — light UI */
 * {
   scrollbar-width: thin;
   scrollbar-color: #0ea5e9 #f1f5f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: #121212;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #ffffff;
+    border-radius: 5px;
+    border: 2px solid #121212;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #e5e5e5;
+  }
+
+  * {
+    scrollbar-color: #ffffff #121212;
+  }
+}
+
+/* Hero chrome: ticket-header black (#121212) track + white thumb */
+html[data-aw-chrome='mono']::-webkit-scrollbar-track,
+html[data-aw-chrome='mono'] ::-webkit-scrollbar-track {
+  background: #121212;
+}
+
+html[data-aw-chrome='mono']::-webkit-scrollbar-thumb,
+html[data-aw-chrome='mono'] ::-webkit-scrollbar-thumb {
+  background: #ffffff;
+  border-radius: 5px;
+  border: 2px solid #121212;
+}
+
+html[data-aw-chrome='mono']::-webkit-scrollbar-thumb:hover,
+html[data-aw-chrome='mono'] ::-webkit-scrollbar-thumb:hover {
+  background: #e5e5e5;
+}
+
+html[data-aw-chrome='mono'],
+html[data-aw-chrome='mono'] * {
+  scrollbar-color: #ffffff #121212;
 }
 
 /* Smooth transitions for all elements */
@@ -156,4 +199,387 @@
 button:focus, input:focus, textarea:focus, select:focus {
   outline: 2px solid #0ea5e9;
   outline-offset: 2px;
+}
+
+/* Scroll reveal (homepage) — cubic ease, respects reduced motion */
+.aw-reveal {
+  opacity: 0;
+  transform: translate3d(0, 2rem, 0);
+  transition:
+    opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.aw-reveal-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Wrapper-only fade — child runs its own entrance (use-case cards) */
+.aw-reveal-fade {
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.aw-reveal-fade.aw-reveal-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aw-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .aw-reveal-fade {
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .aw-usecase-drop {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+
+  .aw-reveal-fade:not(.aw-reveal-visible) .aw-usecase-drop {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* Allow homepage scroll-reveal on small screens (global mobile rules shorten transitions) */
+@media (max-width: 640px) {
+  .aw-reveal {
+    transition-duration: 0.75s !important;
+    transition-property: opacity, transform !important;
+  }
+
+  .aw-reveal-fade.aw-reveal-visible .aw-usecase-drop {
+    animation-duration: 0.58s !important;
+  }
+}
+
+/* About story — playful timeline motion */
+.aw-story-shell {
+  position: relative;
+}
+
+.aw-story-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 24% at 20% 10%, rgba(24, 24, 27, 0.06), transparent 70%),
+    radial-gradient(ellipse 46% 28% at 82% 85%, rgba(24, 24, 27, 0.05), transparent 74%);
+  pointer-events: none;
+}
+
+.aw-story-kicker {
+  animation: aw-story-kicker-glow 3.6s ease-in-out infinite;
+}
+
+.aw-story-card {
+  position: relative;
+  animation: aw-story-card-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--aw-story-delay, 0ms);
+}
+
+.aw-story-card::before {
+  content: "";
+  position: absolute;
+  left: -1.2rem;
+  top: 1.25rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  background: #18181b;
+  box-shadow: 0 0 0 5px rgba(24, 24, 27, 0.08);
+}
+
+.aw-story-rail-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 6rem;
+  animation: aw-story-rail-sweep 2.6s ease-in-out infinite;
+}
+
+@keyframes aw-story-card-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes aw-story-rail-sweep {
+  0%,
+  100% {
+    top: 0;
+    opacity: 0.45;
+  }
+  50% {
+    top: calc(100% - 6rem);
+    opacity: 0.95;
+  }
+}
+
+@keyframes aw-story-kicker-glow {
+  0%,
+  100% {
+    letter-spacing: 0.26em;
+    opacity: 0.75;
+  }
+  50% {
+    letter-spacing: 0.295em;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aw-story-kicker,
+  .aw-story-card,
+  .aw-story-rail-glow {
+    animation: none !important;
+  }
+}
+
+/* Any live event — bounce in from a side (top / bottom / left / right) */
+@keyframes aw-usecase-drop-top {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -118%, 0) scale(0.9);
+  }
+  58% {
+    opacity: 1;
+    transform: translate3d(0, 12px, 0) scale(1.035);
+  }
+  74% {
+    transform: translate3d(0, -7px, 0) scale(0.99);
+  }
+  88% {
+    transform: translate3d(0, 3px, 0) scale(1.008);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes aw-usecase-drop-bottom {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 118%, 0) scale(0.9);
+  }
+  58% {
+    opacity: 1;
+    transform: translate3d(0, -12px, 0) scale(1.035);
+  }
+  74% {
+    transform: translate3d(0, 7px, 0) scale(0.99);
+  }
+  88% {
+    transform: translate3d(0, -3px, 0) scale(1.008);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes aw-usecase-drop-left {
+  0% {
+    opacity: 0;
+    transform: translate3d(-118%, 0, 0) scale(0.9);
+  }
+  58% {
+    opacity: 1;
+    transform: translate3d(12px, 0, 0) scale(1.035);
+  }
+  74% {
+    transform: translate3d(-7px, 0, 0) scale(0.99);
+  }
+  88% {
+    transform: translate3d(3px, 0, 0) scale(1.008);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes aw-usecase-drop-right {
+  0% {
+    opacity: 0;
+    transform: translate3d(118%, 0, 0) scale(0.9);
+  }
+  58% {
+    opacity: 1;
+    transform: translate3d(-12px, 0, 0) scale(1.035);
+  }
+  74% {
+    transform: translate3d(7px, 0, 0) scale(0.99);
+  }
+  88% {
+    transform: translate3d(-3px, 0, 0) scale(1.008);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.aw-reveal-fade:not(.aw-reveal-visible) .aw-usecase-drop {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.aw-reveal-fade.aw-reveal-visible .aw-usecase-drop.aw-from-top {
+  animation: aw-usecase-drop-top 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--aw-stagger, 0) * 1ms);
+}
+
+.aw-reveal-fade.aw-reveal-visible .aw-usecase-drop.aw-from-bottom {
+  animation: aw-usecase-drop-bottom 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--aw-stagger, 0) * 1ms);
+}
+
+.aw-reveal-fade.aw-reveal-visible .aw-usecase-drop.aw-from-left {
+  animation: aw-usecase-drop-left 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--aw-stagger, 0) * 1ms);
+}
+
+.aw-reveal-fade.aw-reveal-visible .aw-usecase-drop.aw-from-right {
+  animation: aw-usecase-drop-right 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--aw-stagger, 0) * 1ms);
+}
+
+/* Features section — scroll choreography (headline → staggered cards) */
+.aw-choreo-headline {
+  opacity: 0;
+  transform: translate3d(0, 2.75rem, 0);
+  filter: blur(11px);
+  transition:
+    opacity 1.08s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.08s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform, filter;
+}
+
+.aw-choreo-headline-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+
+.aw-choreo-card {
+  opacity: 0;
+  transform: translate3d(0, 2.125rem, 0) scale(0.965);
+  transition:
+    opacity 0.92s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.92s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.aw-choreo-card-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aw-choreo-headline,
+  .aw-choreo-card {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .aw-choreo-headline {
+    transform: translate3d(0, 1.75rem, 0);
+    filter: blur(7px);
+    transition-duration: 0.72s !important;
+    transition-property: opacity, transform, filter !important;
+  }
+
+  .aw-choreo-card {
+    transform: translate3d(0, 1.5rem, 0) scale(0.97);
+    transition-duration: 0.68s !important;
+    transition-property: opacity, transform !important;
+  }
+}
+
+/* How it works — single observer, headline + row of tickets */
+.aw-playbook .aw-playbook-headline {
+  opacity: 0;
+  transform: translate3d(0, 1.75rem, 0);
+  filter: blur(8px);
+  transition:
+    opacity 0.88s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.88s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform, filter;
+}
+
+.aw-playbook--visible .aw-playbook-headline {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+
+.aw-playbook .aw-playbook-card {
+  opacity: 0;
+  transform: translate3d(0, 1.35rem, 0) scale(0.97);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.aw-playbook--visible .aw-playbook-card {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aw-playbook .aw-playbook-headline,
+  .aw-playbook .aw-playbook-card {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .aw-playbook .aw-playbook-headline {
+    transform: translate3d(0, 1.25rem, 0);
+    filter: blur(5px);
+    transition-duration: 0.65s !important;
+    transition-property: opacity, transform, filter !important;
+  }
+
+  .aw-playbook .aw-playbook-card {
+    transform: translate3d(0, 1rem, 0) scale(0.98);
+    transition-duration: 0.6s !important;
+    transition-property: opacity, transform !important;
+  }
+
+  /* Mobile reliability: keep key section titles readable even if observer timing varies. */
+  .aw-choreo-headline,
+  .aw-playbook .aw-playbook-headline {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
 }

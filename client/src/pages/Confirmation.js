@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { formatOrderMoney } from '../utils/orderMoney';
 
 const Confirmation = () => {
   const location = useLocation();
@@ -73,7 +74,9 @@ const Confirmation = () => {
                   
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Amount:</span>
-                    <span className="font-bold text-primary-600">₹{order.total_price}</span>
+                    <span className="font-bold text-primary-600">
+                      {formatOrderMoney(order.total_price, order.currency)}
+                    </span>
                   </div>
                 </div>
 

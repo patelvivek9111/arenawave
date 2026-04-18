@@ -10,7 +10,7 @@ const Navbar = () => {
   const updateEmployeeLink = () => {
     const token = localStorage.getItem('employeeToken');
     const user = JSON.parse(localStorage.getItem('employeeUser') || '{}');
-    
+
     if (token && user) {
       if (user.role === 'admin') {
         setEmployeeLink('/admin/dashboard');
@@ -23,10 +23,8 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    // Check if employee is logged in and set appropriate link
     updateEmployeeLink();
 
-    // Listen for storage changes (when user logs in/out)
     const handleStorageChange = (e) => {
       if (e.key === 'employeeToken' || e.key === 'employeeUser') {
         updateEmployeeLink();
@@ -34,12 +32,11 @@ const Navbar = () => {
     };
 
     window.addEventListener('storage', handleStorageChange);
-    
-    // Also listen for custom events (for same-tab changes)
+
     const handleCustomStorageChange = () => {
       updateEmployeeLink();
     };
-    
+
     window.addEventListener('localStorageChange', handleCustomStorageChange);
 
     return () => {
@@ -48,66 +45,66 @@ const Navbar = () => {
     };
   }, []);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-aw-chrome', 'mono');
+    return () => root.removeAttribute('data-aw-chrome');
+  }, []);
+
+  const linkClass = 'relative text-white hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 group';
+  const navSurface = 'bg-[#121212] border-b border-white/15 shadow-none';
+  const linkHoverBg = 'bg-white/10';
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
+    <nav className={`sticky top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300 ${navSurface}`}>
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center group">
             <div className="relative">
-              <span className="text-xl md:text-2xl font-bold gradient-text group-hover:scale-105 transition-transform duration-300">
+              <span className="text-xl md:text-2xl font-bold text-white group-hover:scale-105 transition-transform duration-300">
                 ArenaWave
               </span>
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 group-hover:w-full transition-all duration-300"></div>
+              <div
+                className="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 bg-white"
+              />
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className="relative text-gray-700 hover:text-primary-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 group"
-            >
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-6">
+            <Link to="/" className={linkClass}>
               <span className="relative z-10">Home</span>
-              <div className="absolute inset-0 bg-primary-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+              <div className={`absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 ${linkHoverBg}`} />
             </Link>
-            <Link
-              to="/shop"
-              className="relative text-gray-700 hover:text-primary-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 group"
-            >
+            <Link to="/about" className={linkClass}>
+              <span className="relative z-10">About</span>
+              <div className={`absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 ${linkHoverBg}`} />
+            </Link>
+            <Link to="/shop" className={linkClass}>
               <span className="relative z-10">Shop</span>
-              <div className="absolute inset-0 bg-primary-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+              <div className={`absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 ${linkHoverBg}`} />
             </Link>
-            <Link
-              to="/cart"
-              className="relative text-gray-700 hover:text-primary-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 group"
-            >
+            <Link to="/cart" className={`${linkClass} relative`}>
               <span className="relative z-10">Cart</span>
-              <div className="absolute inset-0 bg-primary-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+              <div className={`absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 ${linkHoverBg}`} />
               {getTotalItems() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-bounce-gentle shadow-lg">
+                <span
+                  className="absolute -top-1 -right-1 text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center bg-white text-zinc-900"
+                >
                   {getTotalItems()}
                 </span>
               )}
             </Link>
-            <Link
-              to={employeeLink}
-              className="relative text-gray-700 hover:text-primary-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 group"
-            >
+            <Link to={employeeLink} className={linkClass}>
               <span className="relative z-10">Employee</span>
-              <div className="absolute inset-0 bg-primary-50 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+              <div className={`absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 ${linkHoverBg}`} />
             </Link>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <button
-              onClick={toggleMobileMenu}
-              className="text-gray-700 hover:text-primary-600 p-2.5 min-w-[44px] min-h-[44px] rounded-lg hover:bg-primary-50 transition-all duration-300 flex items-center justify-center"
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg transition-all duration-300 flex items-center justify-center text-white hover:bg-white/10"
               aria-label="Toggle mobile menu"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,39 +118,49 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200/50 bg-white/95 backdrop-blur-md rounded-b-2xl shadow-lg animate-slide-up">
+          <div
+            className="md:hidden border-t rounded-b-2xl shadow-lg animate-slide-up border-white/15 bg-[#121212]"
+          >
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link
                 to="/"
-                className="text-gray-700 hover:text-primary-600 block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 hover:bg-primary-50 flex items-center"
+                className="block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 flex items-center text-white hover:bg-white/10"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Home
               </Link>
               <Link
+                to="/about"
+                className="block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 flex items-center text-white hover:bg-white/10"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
                 to="/shop"
-                className="text-gray-700 hover:text-primary-600 block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 hover:bg-primary-50 flex items-center"
+                className="block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 flex items-center text-white hover:bg-white/10"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Shop
               </Link>
               <Link
                 to="/cart"
-                className="text-gray-700 hover:text-primary-600 block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 hover:bg-primary-50 relative flex items-center"
+                className="block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 relative flex items-center text-white hover:bg-white/10"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Cart
                 {getTotalItems() > 0 && (
-                  <span className="absolute top-2.5 right-4 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-bounce-gentle shadow-lg">
+                  <span
+                    className="absolute top-2.5 right-4 text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center bg-white text-zinc-900"
+                  >
                     {getTotalItems()}
                   </span>
                 )}
               </Link>
               <Link
                 to={employeeLink}
-                className="text-gray-700 hover:text-primary-600 block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 hover:bg-primary-50 flex items-center"
+                className="block px-4 py-3 min-h-[44px] rounded-lg text-base font-medium transition-all duration-300 flex items-center text-white hover:bg-white/10"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Employee
