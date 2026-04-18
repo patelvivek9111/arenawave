@@ -10,8 +10,8 @@ import { HowItWorksFlowConnector, HowItWorksStepArt } from '../components/howItW
 import ProductPixelReveal from '../components/ProductPixelReveal';
 import HeroPixelBackdrop from '../components/HeroPixelBackdrop';
 
-const HERO_BG =
-  'https://images.unsplash.com/photo-1577223625816-7546f13df25d?auto=format&fit=crop&w=2400&q=85';
+/** Same-origin so CSP / third-party blocks on production cannot strip the hero photo */
+const HERO_BG = `${process.env.PUBLIC_URL || ''}/hero-venue.jpg`;
 
 const USE_CASES = [
   {
