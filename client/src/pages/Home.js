@@ -10,11 +10,7 @@ import { HowItWorksFlowConnector, HowItWorksStepArt } from '../components/howItW
 import ProductPixelReveal from '../components/ProductPixelReveal';
 import HeroPixelBackdrop from '../components/HeroPixelBackdrop';
 
-/**
- * Root-relative URL for a file in `public/`. With `homepage: "."`, CRA sets
- * `PUBLIC_URL` to `"."`, which produced `./hero-venue.jpg` — that resolves to
- * `/about/hero-venue.jpg` on routes like `/about/` and the image 404s on production.
- */
+/** Absolute-from-root URL for files in `public/` (stable on any route and behind CDNs). */
 function publicPath(file) {
   const name = file.replace(/^\//, '');
   const base = process.env.PUBLIC_URL || '';
@@ -158,7 +154,6 @@ const Home = () => {
   const [productCopyRevealed, setProductCopyRevealed] = useState(initialReducedMotion);
   const onProductPixelsComplete = useCallback(() => setProductCopyRevealed(true), []);
   const [productRevealRef, productRevealVisible] = useRevealOnScroll();
-  const [heroPixelReady, setHeroPixelReady] = useState(initialReducedMotion);
 
   return (
     <div className="bg-stone-50 text-zinc-900 antialiased selection:bg-zinc-900/10">
@@ -169,13 +164,11 @@ const Home = () => {
         className="relative isolate min-h-[100svh] flex flex-col items-center justify-center overflow-hidden"
       >
         <div
-          className={`absolute inset-0 z-0 bg-cover bg-center bg-no-repeat scale-[1.02] transition-opacity duration-700 ease-out ${
-            heroPixelReady ? 'opacity-100' : 'opacity-0'
-          }`}
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat scale-[1.02] opacity-100"
           style={{ backgroundImage: `url(${HERO_BG})` }}
           aria-hidden
         />
-        <HeroPixelBackdrop src={HERO_BG} containerRef={heroRef} onComplete={() => setHeroPixelReady(true)} />
+        <HeroPixelBackdrop src={HERO_BG} containerRef={heroRef} />
         <div className="absolute inset-0 z-[2] bg-black/78" aria-hidden />
         <div className="absolute inset-0 z-[3] bg-gradient-to-b from-black/55 via-black/25 to-black/65" aria-hidden />
         {/* Top fade — subtle until scroll (eases letterbox / nav handoff) */}
