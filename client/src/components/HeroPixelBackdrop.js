@@ -55,19 +55,8 @@ export default function HeroPixelBackdrop({ src, containerRef, onComplete }) {
     if (!el || !canvas || ranRef.current) return undefined;
     ranRef.current = true;
 
-    let rafId = 0;
-    let cancelled = false;
-    const loadTimeout = window.setTimeout(() => {
-      if (cancelled) return;
-      cancelled = true;
-      finish();
-    }, 12000);
-
     const imgEl = new Image();
     imgEl.onload = () => {
-      if (cancelled) return;
-      window.clearTimeout(loadTimeout);
-
       const rect = el.getBoundingClientRect();
       const cssW = Math.max(1, rect.width);
       const cssH = Math.max(1, rect.height);
@@ -146,7 +135,6 @@ export default function HeroPixelBackdrop({ src, containerRef, onComplete }) {
       const maxT = Math.max(...pieces.map((p) => p.delay + p.dur)) + 140;
 
       const tick = (now) => {
-        if (cancelled) return;
         const t = now - startAt;
         ctx.clearRect(0, 0, cssW, cssH);
 
@@ -159,29 +147,19 @@ export default function HeroPixelBackdrop({ src, containerRef, onComplete }) {
         }
 
         if (t < maxT) {
-          rafId = window.requestAnimationFrame(tick);
+          requestAnimationFrame(tick);
         } else {
           finish();
         }
       };
 
-      rafId = window.requestAnimationFrame(tick);
+      requestAnimationFrame(tick);
     };
 
-    imgEl.onerror = () => {
-      window.clearTimeout(loadTimeout);
-      if (!cancelled) finish();
-    };
+    imgEl.onerror = () => finish();
     imgEl.src = src;
 
-    return () => {
-      cancelled = true;
-      window.clearTimeout(loadTimeout);
-      if (rafId) window.cancelAnimationFrame(rafId);
-      imgEl.onload = null;
-      imgEl.onerror = null;
-      ranRef.current = false;
-    };
+    return undefined;
   }, [reduced, src, containerRef, finish]);
 
   if (reduced || !visible) return null;
