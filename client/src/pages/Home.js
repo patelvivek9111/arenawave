@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PRODUCT_DISPLAY_NAME } from '../config/product';
 import { useHeroScrollFade } from '../hooks/useHeroScrollFade';
@@ -150,6 +150,11 @@ const Home = () => {
   const [productRevealRef, productRevealVisible] = useRevealOnScroll();
   const [heroPixelReady, setHeroPixelReady] = useState(prefersReducedMotion);
 
+  useEffect(() => {
+    const id = window.setTimeout(() => setHeroPixelReady(true), 5000);
+    return () => window.clearTimeout(id);
+  }, []);
+
   return (
     <div className="bg-stone-50 text-zinc-900 antialiased selection:bg-zinc-900/10">
       {/* Hero — dark scrim; bottom/top light fades ramp up while scrolling */}
@@ -166,6 +171,7 @@ const Home = () => {
           }`}
           loading="eager"
           decoding="async"
+          onError={() => setHeroPixelReady(true)}
           aria-hidden
         />
         <HeroPixelBackdrop src={HERO_BG} containerRef={heroRef} onComplete={() => setHeroPixelReady(true)} />
