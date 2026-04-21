@@ -136,7 +136,7 @@ const OrderDetailsView = ({
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <a
-              href={`mailto:${scannedOrder.email}?subject=Order ${scannedOrder.order_id} - ArenaWave`}
+              href={`mailto:${scannedOrder.email}?subject=Order ${scannedOrder.order_id} - ArenaWav`}
               className="flex items-center justify-center px-4 py-3 bg-zinc-100 text-zinc-800 rounded-lg hover:bg-zinc-200 transition duration-300 border border-zinc-200 min-h-[44px]"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

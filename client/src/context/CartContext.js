@@ -11,7 +11,7 @@ const cartReducer = (state, action) => {
         ...state,
         items: [
           {
-            id: 'arenawave-earwing',
+            id: 'arenawav-earwing',
             name: PRODUCT_DISPLAY_NAME,
             price: action.payload.unitPrice,
             currency: action.payload.currency,

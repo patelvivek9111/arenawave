@@ -20,7 +20,7 @@ const verifyAdmin = (req, res, next) => {
 
   try {
     const jwt = require('jsonwebtoken');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawave-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawav-secret-key');
     
     if (decoded.role !== 'admin') {
       return res.status(403).json({ error: 'Admin access required' });
@@ -43,7 +43,7 @@ const verifyEmployee = (req, res, next) => {
 
   try {
     const jwt = require('jsonwebtoken');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawave-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawav-secret-key');
     
     if (decoded.role !== 'admin' && decoded.role !== 'employee') {
       return res.status(403).json({ error: 'Employee or admin access required' });
@@ -671,9 +671,9 @@ router.post('/employee/order/:orderId/resend-email', verifyEmployee, async (req,
     });
 
     const mailOptions = {
-      from: 'noreply@arenawave.com',
+      from: 'noreply@arenawav.com',
       to: order.email,
-      subject: 'Order Confirmation - ArenaWave Earwing (Resent)',
+      subject: 'Order Confirmation - ArenaWav Earwing (Resent)',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">Order Confirmation</h2>
@@ -682,14 +682,14 @@ router.post('/employee/order/:orderId/resend-email', verifyEmployee, async (req,
           <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>Order Details:</h3>
             <p><strong>Order ID:</strong> ${order.order_id}</p>
-            <p><strong>Product:</strong> ArenaWave Earwing</p>
+            <p><strong>Product:</strong> ArenaWav Earwing</p>
             <p><strong>Quantity:</strong> ${order.quantity}</p>
             <p><strong>Total Amount:</strong> ${orderTotalEmailLabel(order)}</p>
             <p><strong>Status:</strong> ${order.status}</p>
           </div>
           <p>Please present this QR code to collect your order:</p>
           <img src="${order.qr_code}" alt="QR Code" style="max-width: 200px; display: block; margin: 20px auto;">
-          <p>Thank you for choosing ArenaWave!</p>
+          <p>Thank you for choosing ArenaWav!</p>
         </div>
       `
     };
@@ -738,7 +738,7 @@ router.get('/employee/order/:orderId/summary', verifyEmployee, async (req, res) 
         status: order.status,
         created_at: order.created_at,
         fulfilled_at: order.fulfilled_at,
-        product: 'ArenaWave Earwing',
+        product: 'ArenaWav Earwing',
         unit_price
       }
     });

@@ -1,7 +1,7 @@
 {
-  "name": "arenawave-ecommerce",
+  "name": "arenawav-ecommerce",
   "version": "1.0.0",
-  "description": "ArenaWave — in-venue synchronized live audio for stadiums and large events",
+  "description": "ArenaWav — in-venue synchronized live audio for stadiums and large events",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -32,6 +32,6 @@
     "nodejs",
     "mongodb"
   ],
-  "author": "ArenaWave",
+  "author": "ArenaWav",
   "license": "MIT"
 }

@@ -5,6 +5,14 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        /** Site-wide: Michroma + Inter fallbacks */
+        sans: ['Michroma', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Michroma', 'Inter', 'system-ui', 'sans-serif'],
+        body: ['Michroma', 'Inter', 'system-ui', 'sans-serif'],
+        /** Alias for nav / wordmarks */
+        futuristic: ['Michroma', 'Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         primary: {
           50: '#f0f9ff',
@@ -30,10 +38,6 @@ module.exports = {
           800: '#86198f',
           900: '#701a75',
         }
-      },
-      fontFamily: {
-        'display': ['Inter', 'system-ui', 'sans-serif'],
-        'body': ['Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

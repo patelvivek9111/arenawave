@@ -167,9 +167,9 @@ router.post('/create', async (req, res) => {
     
     // Send email confirmation
     const mailOptions = {
-      from: 'noreply@arenawave.com',
+      from: 'noreply@arenawav.com',
       to: email,
-      subject: 'Order Confirmation - ArenaWave Earwing',
+      subject: 'Order Confirmation - ArenaWav Earwing',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">Order Confirmation</h2>
@@ -178,13 +178,13 @@ router.post('/create', async (req, res) => {
           <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>Order Details:</h3>
             <p><strong>Order ID:</strong> ${order_id}</p>
-            <p><strong>Product:</strong> ArenaWave Earwing</p>
+            <p><strong>Product:</strong> ArenaWav Earwing</p>
             <p><strong>Quantity:</strong> ${quantity}</p>
             <p><strong>Total Amount:</strong> ${totalLabel}</p>
           </div>
           <p>Please present this QR code to collect your order:</p>
           <img src="${qr_code}" alt="QR Code" style="max-width: 200px; display: block; margin: 20px auto;">
-          <p>Thank you for choosing ArenaWave!</p>
+          <p>Thank you for choosing ArenaWav!</p>
         </div>
       `
     };
@@ -301,7 +301,7 @@ router.put('/fulfill/:orderId', async (req, res) => {
 
     // Verify token and get employee info
     const jwt = require('jsonwebtoken');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawave-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawav-secret-key');
     
     const Order = require('../models/Order');
     const Counter = require('../models/Counter');

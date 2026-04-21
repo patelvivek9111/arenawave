@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,13 +7,14 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    background-color: #fafaf9;
   }
   
   body {
     margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
+    font-family: 'Michroma', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+      'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #fafaf9;
@@ -260,6 +262,46 @@ button:focus, input:focus, textarea:focus, select:focus {
 
   .aw-reveal-fade.aw-reveal-visible .aw-usecase-drop {
     animation-duration: 0.58s !important;
+  }
+
+  /* Hero copy drop runs after pixel effect — exempt from global `*` animation squash */
+  .aw-hero-copy-drop-bounce {
+    animation-duration: 0.92s !important;
+  }
+}
+
+/* Home hero: after pixel backdrop finishes, copy drops from top with a small bounce */
+@keyframes aw-hero-copy-drop-bounce {
+  0% {
+    transform: translate3d(0, -82vh, 0);
+    opacity: 0.92;
+  }
+  58% {
+    transform: translate3d(0, 14px, 0);
+    opacity: 1;
+  }
+  74% {
+    transform: translate3d(0, -7px, 0);
+  }
+  88% {
+    transform: translate3d(0, 3px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+.aw-hero-copy-drop-bounce {
+  animation: aw-hero-copy-drop-bounce 0.92s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aw-hero-copy-drop-bounce {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
   }
 }
 

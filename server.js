@@ -28,7 +28,7 @@ const mongooseOpts = {
 
 async function connectLocalOrMemory() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/arenawave', mongooseOpts);
+    await mongoose.connect('mongodb://localhost:27017/arenawav', mongooseOpts);
     console.log('Connected to local MongoDB');
     isConnected = true;
   } catch {
@@ -113,13 +113,14 @@ const counterRoutes = require('./routes/counters');
 app.get('/manifest.json', (req, res) => {
   // Return manifest JSON directly to avoid filesystem issues in serverless
   const manifest = {
-    "short_name": "ArenaWave",
-    "name": "ArenaWave E-commerce",
+    "short_name": "ArenaWav",
+    "name": "ArenaWav E-commerce",
     "icons": [
       {
-        "src": "favicon.ico",
-        "sizes": "64x64 32x32 24x24 16x16",
-        "type": "image/x-icon"
+        "src": "favicon.png",
+        "sizes": "512x512 192x192 32x32",
+        "type": "image/png",
+        "purpose": "any maskable"
       }
     ],
     "start_url": ".",

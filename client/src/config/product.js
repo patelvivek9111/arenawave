@@ -1,6 +1,6 @@
 import { formatMoney } from './pricing';
 
-export const PRODUCT_DISPLAY_NAME = 'ArenaWave Earwing';
+export const PRODUCT_DISPLAY_NAME = 'ArenaWav Earwing';
 
 export { formatMoney } from './pricing';
 

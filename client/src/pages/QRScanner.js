@@ -719,7 +719,7 @@ const QRScanner = () => {
             </head>
             <body>
               <div class="header">
-                <h1>ArenaWave</h1>
+                <h1>ArenaWav</h1>
                 <p>Order Summary</p>
               </div>
               
@@ -782,7 +782,7 @@ const QRScanner = () => {
 
               <div class="footer">
                 <p>Generated on ${new Date().toLocaleString()}</p>
-                <p>ArenaWave - Order Management System</p>
+                <p>ArenaWav - Order Management System</p>
               </div>
             </body>
           </html>

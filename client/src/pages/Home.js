@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { PRODUCT_DISPLAY_NAME } from '../config/product';
 import { useHeroScrollFade } from '../hooks/useHeroScrollFade';
@@ -9,10 +9,10 @@ import PlaybookGroupReveal from '../components/PlaybookGroupReveal';
 import { HowItWorksFlowConnector, HowItWorksStepArt } from '../components/howItWorks/HowItWorksStepArt';
 import ProductPixelReveal from '../components/ProductPixelReveal';
 import HeroPixelBackdrop from '../components/HeroPixelBackdrop';
-import heroVenueJpg from '../assets/hero-venue.jpg';
+import heroImage from '../assets/Hero_image.png';
 
-/** Webpack-resolved URL so hero + canvas match the deploy base (subpath, CDN, etc.). */
-const HERO_BG = heroVenueJpg;
+/** Home hero + pixel backdrop source (`client/src/assets/Hero_image.png`). */
+const HERO_BG = heroImage;
 
 const USE_CASES = [
   {
@@ -144,10 +144,11 @@ function initialReducedMotion() {
 const Home = () => {
   const heroRef = useRef(null);
   useHeroScrollFade(heroRef);
-  const [productCopyRevealed, setProductCopyRevealed] = useState(initialReducedMotion);
+  const prefersReducedMotion = useMemo(() => initialReducedMotion(), []);
+  const [productCopyRevealed, setProductCopyRevealed] = useState(prefersReducedMotion);
   const onProductPixelsComplete = useCallback(() => setProductCopyRevealed(true), []);
   const [productRevealRef, productRevealVisible] = useRevealOnScroll();
-  const [heroPixelReady, setHeroPixelReady] = useState(initialReducedMotion);
+  const [heroPixelReady, setHeroPixelReady] = useState(prefersReducedMotion);
 
   return (
     <div className="bg-stone-50 text-zinc-900 antialiased selection:bg-zinc-900/10">
@@ -155,12 +156,12 @@ const Home = () => {
       <section
         id="aw-home-hero"
         ref={heroRef}
-        className="relative isolate min-h-[100svh] flex flex-col items-center justify-center overflow-hidden"
+        className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-x-hidden overflow-y-visible"
       >
         <img
           src={HERO_BG}
           alt=""
-          className={`pointer-events-none absolute inset-0 z-0 h-full w-full scale-[1.02] object-cover transition-opacity duration-700 ease-out ${
+          className={`pointer-events-none absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-out ${
             heroPixelReady ? 'opacity-100' : 'opacity-0'
           }`}
           loading="eager"
@@ -168,8 +169,7 @@ const Home = () => {
           aria-hidden
         />
         <HeroPixelBackdrop src={HERO_BG} containerRef={heroRef} onComplete={() => setHeroPixelReady(true)} />
-        <div className="absolute inset-0 z-[2] bg-black/78" aria-hidden />
-        <div className="absolute inset-0 z-[3] bg-gradient-to-b from-black/55 via-black/25 to-black/65" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-black/[0.50]" aria-hidden />
         {/* Top fade — subtle until scroll (eases letterbox / nav handoff) */}
         <div
           className="pointer-events-none absolute inset-x-0 top-0 z-[4] h-28 md:h-36 bg-gradient-to-b from-stone-50 to-transparent will-change-[opacity]"
@@ -186,60 +186,68 @@ const Home = () => {
           aria-hidden
         />
 
-        <Reveal className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 text-center pt-28 pb-24 md:pt-32 md:pb-32">
-          <p className="text-[11px] sm:text-xs font-semibold tracking-[0.35em] uppercase text-zinc-300 mb-10 md:mb-14 [text-shadow:0_1px_8px_rgba(0,0,0,0.9)]">
-            ArenaWave
-          </p>
-          <h1 className="text-[2.75rem] sm:text-6xl md:text-7xl lg:text-8xl font-semibold tracking-[-0.04em] leading-[0.95] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.85),0_4px_48px_rgba(0,0,0,0.5)]">
-            Live audio.
-            <span className="block mt-2 md:mt-4 text-zinc-200 font-normal tracking-tight [text-shadow:0_2px_20px_rgba(0,0,0,0.8)]">
-              Every seat.
-            </span>
-          </h1>
-          <p className="mt-10 md:mt-14 text-base sm:text-lg md:text-xl text-zinc-200 font-light max-w-lg mx-auto leading-relaxed [text-shadow:0_1px_12px_rgba(0,0,0,0.9)]">
-            Real-time, synchronized sound for venues worldwide—without relying on fan connectivity.
-          </p>
-          <div className="mt-12 md:mt-16 flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8">
-            <Link
-              to="/shop"
-              className="inline-flex items-center justify-center min-h-[48px] px-10 rounded-full bg-white text-zinc-950 text-sm font-semibold tracking-wide hover:bg-zinc-100 transition-colors duration-300 w-full sm:w-auto shadow-[0_4px_24px_rgba(0,0,0,0.35)]"
+        {(heroPixelReady || prefersReducedMotion) && (
+          <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 text-center pt-28 pb-24 md:pt-32 md:pb-32">
+            <div
+              className={`mx-auto rounded-2xl border border-transparent bg-black/[0.50] px-8 py-10 sm:px-10 sm:py-12 md:px-12 md:py-14 ${
+                heroPixelReady && !prefersReducedMotion ? 'aw-hero-copy-drop-bounce' : ''
+              }`.trim()}
             >
-              Shop Earwing
-            </Link>
-            <span className="text-sm text-zinc-200 [text-shadow:0_1px_8px_rgba(0,0,0,0.85)]">
-              {PRODUCT_DISPLAY_NAME}
-            </span>
-            {/* Launch hold: restore price next to CTA — usePricing (geoReady, formatPrice, unitPrice), skeleton, and “price · name” row */}
+              <p className="text-[11px] font-medium tracking-[0.14em] text-zinc-200 [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
+                ArenaWav
+              </p>
+              <h1 className="mt-5 text-[2.35rem] font-semibold leading-[1.06] tracking-[-0.03em] text-white sm:mt-6 sm:text-5xl md:text-6xl md:leading-[1.05] lg:text-[3.5rem] lg:leading-[1.04] [text-shadow:0_1px_2px_rgba(0,0,0,0.9),0_4px_28px_rgba(0,0,0,0.65)]">
+                <span className="block">Live audio.</span>
+                <span className="mt-1.5 block font-medium text-zinc-100 sm:mt-2 md:mt-2.5">
+                  Every seat.
+                </span>
+              </h1>
+              <p className="mx-auto mt-6 max-w-md text-[15px] font-light leading-relaxed text-zinc-100 sm:mt-7 sm:text-base md:mt-8 md:text-lg [text-shadow:0_1px_2px_rgba(0,0,0,0.85),0_2px_20px_rgba(0,0,0,0.55)]">
+                Real-time, synchronized sound for venues worldwide—without relying on fan connectivity.
+              </p>
+              <div className="mt-8 flex flex-col items-center gap-4 border-t border-transparent pt-8 sm:mt-9 sm:flex-row sm:justify-center sm:gap-6 sm:pt-9">
+                <Link
+                  to="/shop"
+                  className="inline-flex w-full min-h-[48px] max-w-xs items-center justify-center rounded-full bg-white px-8 text-sm font-semibold tracking-wide text-zinc-950 shadow-[0_4px_24px_rgba(0,0,0,0.25)] transition-colors duration-300 hover:bg-zinc-100 sm:w-auto sm:min-w-[11rem] sm:max-w-none"
+                >
+                  Shop Earwing
+                </Link>
+                <p className="text-center text-xs font-medium tracking-wide text-zinc-200 [text-shadow:0_1px_10px_rgba(0,0,0,0.55)] sm:text-left sm:text-sm">
+                  {PRODUCT_DISPLAY_NAME}
+                </p>
+              </div>
+              {/* Launch hold: restore price next to CTA — usePricing (geoReady, formatPrice, unitPrice), skeleton, and “price · name” row */}
+            </div>
           </div>
-        </Reveal>
+        )}
       </section>
 
       {/* Features — event-ticket cards + scroll choreography */}
       <section className="border-t border-stone-200/80 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(120,113,108,0.08),transparent_55%),linear-gradient(180deg,#fafaf9_0%,#ffffff_45%,#fafaf9_100%)] overflow-x-clip">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-28 md:py-40 lg:py-48">
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 pt-8 pb-16 md:pt-10 md:pb-20 lg:pt-12 lg:pb-24">
           <ChoreoReveal role="headline">
             <h2 className="text-3xl sm:text-4xl md:text-6xl font-semibold tracking-[-0.03em] text-zinc-900 text-center max-w-2xl mx-auto leading-[1.05]">
               Built for the venue.
             </h2>
-            <p className="mt-5 text-center text-sm font-medium uppercase tracking-[0.25em] text-zinc-400">
+            <p className="mt-4 text-center text-sm font-medium tracking-[0.25em] text-zinc-400">
               Admit all sections
             </p>
           </ChoreoReveal>
-          <div className="mt-16 md:mt-24 grid sm:grid-cols-2 lg:grid-cols-4 gap-7 md:gap-6 lg:gap-5 items-stretch">
+          <div className="mt-10 md:mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-7 md:gap-6 lg:gap-5 items-stretch">
             {FEATURES.map(({ icon: Icon, title, line, ticketId, gate }, i) => (
-              <ChoreoReveal key={title} delayMs={140 + i * 115} className="h-full min-h-0">
-                <article className="group relative flex h-full min-h-[320px] flex-col overflow-hidden rounded-2xl border border-stone-300/80 bg-white shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_14px_40px_-18px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.03)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_1px_0_rgba(255,255,255,0.95)_inset,0_24px_56px_-24px_rgba(0,0,0,0.22)]">
-                  {/* Ticket header — like a printed stub */}
-                  <div className="relative bg-[#121212] px-5 pt-5 pb-5 text-left ring-1 ring-white/[0.06]">
+              <ChoreoReveal key={title} delayMs={140 + i * 115} className="flex h-full min-h-0 flex-col">
+                <article className="group relative flex h-full min-h-[320px] min-w-0 flex-col overflow-hidden rounded-2xl border border-stone-300/80 bg-white shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_14px_40px_-18px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.03)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_1px_0_rgba(255,255,255,0.95)_inset,0_24px_56px_-24px_rgba(0,0,0,0.22)]">
+                  {/* Ticket header — like a printed stub (fixed min height so perforation + body align across cards) */}
+                  <div className="relative shrink-0 bg-[#121212] px-5 pt-5 pb-5 text-left ring-1 ring-white/[0.06] min-h-[8.5rem]">
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
-                          ArenaWave
+                      <div className="min-w-0 flex-1 pr-1">
+                        <p className="text-[10px] font-semibold tracking-[0.28em] text-zinc-500">
+                          ArenaWav
                         </p>
                         <p className="mt-2 font-mono text-[11px] font-semibold tracking-wider text-white tabular-nums">
                           {ticketId}
                         </p>
-                        <p className="mt-3 text-[9px] font-medium uppercase tracking-[0.35em] text-zinc-500">
+                        <p className="mt-3 min-h-[2.75rem] text-[9px] font-medium leading-snug tracking-[0.35em] text-zinc-500">
                           Live audio · {gate}
                         </p>
                       </div>
@@ -268,13 +276,15 @@ const Home = () => {
                     />
                   </div>
 
-                  <div className="flex flex-1 flex-col px-5 pb-5 pt-1 text-left">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400">Feature</p>
-                    <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-900">{title}</h3>
+                  <div className="flex min-h-0 flex-1 flex-col px-5 pb-5 pt-1 text-left">
+                    <p className="text-[10px] font-semibold tracking-[0.2em] text-zinc-400">Feature</p>
+                    <h3 className="mt-2 min-h-[3.25rem] text-lg font-semibold leading-snug tracking-tight text-zinc-900">
+                      {title}
+                    </h3>
                     <p className="mt-3 flex-1 text-sm font-light leading-relaxed text-zinc-600">{line}</p>
 
                     {/* Decorative barcode strip */}
-                    <div className="mt-6 space-y-2">
+                    <div className="mt-auto space-y-2 pt-6">
                       <div
                         className="h-9 w-full rounded-sm bg-[repeating-linear-gradient(90deg,#18181b_0px,#18181b_2px,transparent_2px,transparent_5px)] opacity-[0.85] mix-blend-multiply"
                         aria-hidden
@@ -299,7 +309,7 @@ const Home = () => {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-[-0.03em] text-zinc-900 text-center leading-[1.05]">
                 How it works
               </h2>
-              <p className="mt-3 md:mt-4 text-center text-xs sm:text-sm font-medium uppercase tracking-[0.22em] text-zinc-500">
+              <p className="mt-3 md:mt-4 text-center text-xs sm:text-sm font-medium tracking-[0.22em] text-zinc-500">
                 From booth to every seat
               </p>
               <p className="mt-3 text-center text-[11px] text-zinc-400 font-light max-w-md mx-auto leading-relaxed">
@@ -325,13 +335,13 @@ const Home = () => {
                           {step}
                         </span>
                         <HowItWorksStepArt variant={visual} className="relative z-[1] drop-shadow-sm" />
-                        <p className="relative z-[1] mt-2 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-500">
+                        <p className="relative z-[1] mt-2 text-center text-[10px] font-medium tracking-[0.2em] text-zinc-500">
                           {propLabel}
                         </p>
                       </div>
 
                       <div className="flex flex-1 flex-col border-t border-stone-200/90 bg-white px-4 pb-4 pt-3.5 text-left">
-                        <span className="inline-flex w-fit rounded-full border border-zinc-200 bg-stone-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-zinc-700">
+                        <span className="inline-flex w-fit rounded-full border border-zinc-200 bg-stone-50 px-2 py-0.5 text-[9px] font-bold tracking-[0.18em] text-zinc-700">
                           {phase}
                         </span>
                         <h3 className="mt-2.5 text-lg md:text-xl font-semibold tracking-tight text-zinc-900 leading-snug">
@@ -359,7 +369,7 @@ const Home = () => {
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-[-0.03em] text-zinc-900 leading-[1.05]">
                 Any live event
               </h2>
-              <p className="mt-4 text-xs sm:text-sm font-semibold uppercase tracking-[0.28em] text-zinc-400">
+              <p className="mt-4 text-xs sm:text-sm font-semibold tracking-[0.28em] text-zinc-400">
                 Sports · Tours · Festivals
               </p>
               <p className="mt-5 text-zinc-600 font-light text-base md:text-lg leading-relaxed">
@@ -388,7 +398,7 @@ const Home = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/5" />
                       <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75">{item.tag}</p>
+                        <p className="text-[10px] font-semibold tracking-[0.18em] text-white/75">{item.tag}</p>
                         <p className="mt-1.5 text-lg sm:text-xl font-semibold tracking-tight text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
                           {item.title}
                         </p>
@@ -424,7 +434,7 @@ const Home = () => {
                     className="pointer-events-none absolute inset-x-8 bottom-[18%] h-1/4 rounded-[100%] bg-zinc-900/[0.06] blur-2xl"
                     aria-hidden
                   />
-                  <p className="relative z-[1] pt-7 sm:pt-8 text-center text-[10px] font-semibold uppercase tracking-[0.3em] text-zinc-400">
+                  <p className="relative z-[1] pt-7 sm:pt-8 text-center text-[10px] font-semibold tracking-[0.3em] text-zinc-400">
                     In-venue receiver
                   </p>
                   <div className="relative z-[1] flex h-[calc(100%-4.25rem)] min-h-[200px] items-center justify-center px-8 pb-10 pt-2 sm:px-12">
@@ -443,7 +453,7 @@ const Home = () => {
                   productCopyRevealed ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
                 }`}
               >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-zinc-400">Product</p>
+                <p className="text-[11px] font-semibold tracking-[0.26em] text-zinc-400">Product</p>
                 <h2 className="mt-4 text-3xl sm:text-4xl md:text-[2.75rem] font-semibold tracking-[-0.035em] text-zinc-900 leading-[1.08]">
                   {PRODUCT_DISPLAY_NAME}
                 </h2>

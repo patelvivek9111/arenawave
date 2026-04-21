@@ -30,7 +30,7 @@ const Shop = () => {
     <div className="min-h-screen bg-white py-8 sm:py-12 md:py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10 sm:mb-14">
-          <p className="text-xs font-medium tracking-[0.2em] uppercase text-zinc-500 mb-4">ArenaWave</p>
+          <p className="text-xs font-medium tracking-[0.2em] text-zinc-500 mb-4">ArenaWav</p>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-zinc-900 tracking-tight mb-4">
             {PRODUCT_DISPLAY_NAME}
           </h1>
@@ -66,7 +66,7 @@ const Shop = () => {
                       formatPrice(unitPrice)
                     )}
                   </h2>
-                  <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">Per unit</span>
+                  <span className="text-xs font-medium tracking-wider text-zinc-500">Per unit</span>
                 </div>
                 {geoReady && (
                   <p className="text-xs text-zinc-500 font-light mt-2">

@@ -1,6 +1,6 @@
-`# ArenaWave - E-commerce Platform
+# ArenaWav - E-commerce Platform
 
-A web application for ArenaWave — in-venue live audio for stadiums and large events — including e-commerce for the Earwing receiver. Built with React frontend, Node.js/Express backend, and MongoDB database.
+A web application for ArenaWav — in-venue live audio for stadiums and large events — including e-commerce for the Earwing receiver. Built with React frontend, Node.js/Express backend, and MongoDB database.
 
 **🌐 Live Website:** https://www.arenawav.com
 
@@ -90,7 +90,7 @@ A web application for ArenaWave — in-venue live audio for stadiums and large e
 ## 📁 Project Structure
 
 ```
-ArenaWave/
+ArenaWav/
 ├── api/                          # Vercel serverless functions
 │   ├── index.js                  # Main API handler
 │   └── manifest.js              # Manifest.json handler
@@ -285,7 +285,7 @@ ArenaWave/
 1. **Clone the repository**
    ```bash
    git clone https://github.com/patelvivek9111/arenawave.git
-   cd ArenaWave
+   cd arenawave
    ```
 
 2. **Install dependencies**
@@ -303,9 +303,9 @@ ArenaWave/
    Create a `.env` file in the root directory:
    ```env
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/arenawave
+   MONGODB_URI=mongodb://localhost:27017/arenawav
    # Or use MongoDB Atlas:
-   # MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/arenawave
+   # MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/arenawav
    JWT_SECRET=your-secret-key-here
    NODE_ENV=development
    ```
@@ -501,4 +501,4 @@ For support and questions, please contact the development team.
 
 ---
 
-**Built with ❤️ for ArenaWave**
+**Built with ❤️ for ArenaWav**

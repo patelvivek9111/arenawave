@@ -4,13 +4,14 @@ module.exports = (req, res) => {
   console.log('Headers:', JSON.stringify(req.headers));
   
   const manifest = {
-    "short_name": "ArenaWave",
-    "name": "ArenaWave — In-venue live audio",
+    "short_name": "ArenaWav",
+    "name": "ArenaWav — In-venue live audio",
     "icons": [
       {
-        "src": "favicon.ico",
-        "sizes": "64x64 32x32 24x24 16x16",
-        "type": "image/x-icon"
+        "src": "favicon.png",
+        "sizes": "512x512 192x192 32x32",
+        "type": "image/png",
+        "purpose": "any maskable"
       }
     ],
     "start_url": ".",

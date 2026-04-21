@@ -129,29 +129,29 @@ export default function About() {
   return (
     <div className="bg-stone-50 text-zinc-900 antialiased selection:bg-zinc-900/10">
       <section className="border-t border-stone-200/80 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(120,113,108,0.08),transparent_55%),linear-gradient(180deg,#fafaf9_0%,#ffffff_45%,#fafaf9_100%)] overflow-x-clip">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 pt-12 md:pt-16 lg:pt-20 pb-28 md:pb-40 lg:pb-48">
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 pt-8 pb-16 md:pt-10 md:pb-20 lg:pt-12 lg:pb-24">
           <ChoreoReveal role="headline">
             <h2 className="text-3xl sm:text-4xl md:text-6xl font-semibold tracking-[-0.03em] text-zinc-900 text-center max-w-2xl mx-auto leading-[1.05]">
               Built for the venue.
             </h2>
-            <p className="mt-5 text-center text-sm font-medium uppercase tracking-[0.25em] text-zinc-400">
+            <p className="mt-4 text-center text-sm font-medium tracking-[0.25em] text-zinc-400">
               Admit all sections
             </p>
           </ChoreoReveal>
-          <div className="mt-16 md:mt-24 grid sm:grid-cols-2 lg:grid-cols-4 gap-7 md:gap-6 lg:gap-5 items-stretch">
+          <div className="mt-10 md:mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-7 md:gap-6 lg:gap-5 items-stretch">
             {FEATURES.map(({ icon: Icon, title, line, ticketId, gate }, i) => (
-              <ChoreoReveal key={title} delayMs={140 + i * 115} className="h-full min-h-0">
-                <article className="group relative flex h-full min-h-[320px] flex-col overflow-hidden rounded-2xl border border-stone-300/80 bg-white shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_14px_40px_-18px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.03)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_1px_0_rgba(255,255,255,0.95)_inset,0_24px_56px_-24px_rgba(0,0,0,0.22)]">
-                  <div className="relative bg-[#121212] px-5 pt-5 pb-5 text-left ring-1 ring-white/[0.06]">
+              <ChoreoReveal key={title} delayMs={140 + i * 115} className="flex h-full min-h-0 flex-col">
+                <article className="group relative flex h-full min-h-[320px] min-w-0 flex-col overflow-hidden rounded-2xl border border-stone-300/80 bg-white shadow-[0_1px_0_rgba(255,255,255,0.9)_inset,0_14px_40px_-18px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.03)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_1px_0_rgba(255,255,255,0.95)_inset,0_24px_56px_-24px_rgba(0,0,0,0.22)]">
+                  <div className="relative shrink-0 bg-[#121212] px-5 pt-5 pb-5 text-left ring-1 ring-white/[0.06] min-h-[8.5rem]">
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
-                          ArenaWave
+                      <div className="min-w-0 flex-1 pr-1">
+                        <p className="text-[10px] font-semibold tracking-[0.28em] text-zinc-500">
+                          ArenaWav
                         </p>
                         <p className="mt-2 font-mono text-[11px] font-semibold tracking-wider text-white tabular-nums">
                           {ticketId}
                         </p>
-                        <p className="mt-3 text-[9px] font-medium uppercase tracking-[0.35em] text-zinc-500">
+                        <p className="mt-3 min-h-[2.75rem] text-[9px] font-medium leading-snug tracking-[0.35em] text-zinc-500">
                           Live audio · {gate}
                         </p>
                       </div>
@@ -177,11 +177,13 @@ export default function About() {
                       aria-hidden
                     />
                   </div>
-                  <div className="flex flex-1 flex-col px-5 pb-5 pt-1 text-left">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400">Feature</p>
-                    <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-900">{title}</h3>
+                  <div className="flex min-h-0 flex-1 flex-col px-5 pb-5 pt-1 text-left">
+                    <p className="text-[10px] font-semibold tracking-[0.2em] text-zinc-400">Feature</p>
+                    <h3 className="mt-2 min-h-[3.25rem] text-lg font-semibold leading-snug tracking-tight text-zinc-900">
+                      {title}
+                    </h3>
                     <p className="mt-3 flex-1 text-sm font-light leading-relaxed text-zinc-600">{line}</p>
-                    <div className="mt-6 space-y-2">
+                    <div className="mt-auto space-y-2 pt-6">
                       <div
                         className="h-9 w-full rounded-sm bg-[repeating-linear-gradient(90deg,#18181b_0px,#18181b_2px,transparent_2px,transparent_5px)] opacity-[0.85] mix-blend-multiply"
                         aria-hidden
@@ -205,7 +207,7 @@ export default function About() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-[-0.03em] text-zinc-900 text-center leading-[1.05]">
                 How it works
               </h2>
-              <p className="mt-3 md:mt-4 text-center text-xs sm:text-sm font-medium uppercase tracking-[0.22em] text-zinc-500">
+              <p className="mt-3 md:mt-4 text-center text-xs sm:text-sm font-medium tracking-[0.22em] text-zinc-500">
                 From booth to every seat
               </p>
               <p className="mt-3 text-center text-[11px] text-zinc-400 font-light max-w-md mx-auto leading-relaxed">
@@ -230,12 +232,12 @@ export default function About() {
                           {step}
                         </span>
                         <HowItWorksStepArt variant={visual} className="relative z-[1] drop-shadow-sm" />
-                        <p className="relative z-[1] mt-2 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-500">
+                        <p className="relative z-[1] mt-2 text-center text-[10px] font-medium tracking-[0.2em] text-zinc-500">
                           {propLabel}
                         </p>
                       </div>
                       <div className="flex flex-1 flex-col border-t border-stone-200/90 bg-white px-4 pb-4 pt-3.5 text-left">
-                        <span className="inline-flex w-fit rounded-full border border-zinc-200 bg-stone-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-zinc-700">
+                        <span className="inline-flex w-fit rounded-full border border-zinc-200 bg-stone-50 px-2 py-0.5 text-[9px] font-bold tracking-[0.18em] text-zinc-700">
                           {phase}
                         </span>
                         <h3 className="mt-2.5 text-lg md:text-xl font-semibold tracking-tight text-zinc-900 leading-snug">
@@ -262,7 +264,7 @@ export default function About() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-[-0.03em] text-zinc-900 leading-[1.05]">
                 Any live event
               </h2>
-              <p className="mt-4 text-xs sm:text-sm font-semibold uppercase tracking-[0.28em] text-zinc-400">
+              <p className="mt-4 text-xs sm:text-sm font-semibold tracking-[0.28em] text-zinc-400">
                 Sports · Tours · Festivals
               </p>
               <p className="mt-5 text-zinc-600 font-light text-base md:text-lg leading-relaxed">
@@ -291,7 +293,7 @@ export default function About() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/5" />
                       <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75">{item.tag}</p>
+                        <p className="text-[10px] font-semibold tracking-[0.18em] text-white/75">{item.tag}</p>
                         <p className="mt-1.5 text-lg sm:text-xl font-semibold tracking-tight text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
                           {item.title}
                         </p>
@@ -308,7 +310,7 @@ export default function About() {
       <section className="aw-story-shell border-t border-stone-200/80 bg-[linear-gradient(180deg,#fafaf9_0%,#ffffff_55%,#fafaf9_100%)]">
         <div className="max-w-4xl mx-auto px-6 sm:px-8 pt-12 md:pt-16 lg:pt-20 pb-16 md:pb-20">
           <Reveal>
-            <p className="aw-story-kicker text-[11px] font-semibold uppercase tracking-[0.26em] text-zinc-400 text-center">Our story</p>
+            <p className="aw-story-kicker text-[11px] font-semibold tracking-[0.26em] text-zinc-400 text-center">Our story</p>
             <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-[-0.03em] text-zinc-900 text-center leading-[1.08]">
               From one stadium moment to a new way to watch live.
             </h1>

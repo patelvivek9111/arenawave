@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Shop from './pages/Shop';
@@ -19,9 +20,9 @@ import { PricingProvider } from './context/PricingContext';
 
 function AppRoutes() {
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="flex min-h-screen min-w-0 flex-col overflow-x-clip bg-stone-50 font-sans antialiased">
       <Navbar />
-      <main className="relative">
+      <main className="relative min-w-0 flex-1 overflow-x-clip">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -38,6 +39,7 @@ function AppRoutes() {
           <Route path="/admin/counters" element={<AdminCounters />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -36,7 +36,7 @@ router.post('/login', async (req, res) => {
         username, 
         role: employee.role 
       },
-      process.env.JWT_SECRET || 'arenawave-secret-key',
+      process.env.JWT_SECRET || 'arenawav-secret-key',
       { expiresIn: '24h' }
     );
     
@@ -64,7 +64,7 @@ const verifyToken = (req, res, next) => {
   }
   
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawave-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawav-secret-key');
     req.user = decoded;
     next();
   } catch (error) {

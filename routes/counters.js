@@ -13,7 +13,7 @@ const verifyAdmin = (req, res, next) => {
 
   try {
     const jwt = require('jsonwebtoken');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawave-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawav-secret-key');
     
     if (decoded.role !== 'admin') {
       return res.status(403).json({ error: 'Admin access required' });
@@ -36,7 +36,7 @@ const verifyEmployee = (req, res, next) => {
 
   try {
     const jwt = require('jsonwebtoken');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawave-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'arenawav-secret-key');
     
     if (decoded.role !== 'admin' && decoded.role !== 'employee') {
       return res.status(403).json({ error: 'Employee or admin access required' });
@@ -53,7 +53,7 @@ const verifyEmployee = (req, res, next) => {
 async function ensureMongoConnection() {
   const mongoose = require('mongoose');
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/arenawave');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/arenawav');
   }
 }
 
