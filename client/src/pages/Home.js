@@ -157,11 +157,14 @@ const Home = () => {
         ref={heroRef}
         className="relative isolate min-h-[100svh] flex flex-col items-center justify-center overflow-hidden"
       >
-        <div
-          className={`absolute inset-0 z-0 bg-cover bg-center bg-no-repeat scale-[1.02] transition-opacity duration-700 ease-out ${
+        <img
+          src={HERO_BG}
+          alt=""
+          className={`pointer-events-none absolute inset-0 z-0 h-full w-full scale-[1.02] object-cover transition-opacity duration-700 ease-out ${
             heroPixelReady ? 'opacity-100' : 'opacity-0'
           }`}
-          style={{ backgroundImage: `url(${HERO_BG})` }}
+          loading="eager"
+          decoding="async"
           aria-hidden
         />
         <HeroPixelBackdrop src={HERO_BG} containerRef={heroRef} onComplete={() => setHeroPixelReady(true)} />
