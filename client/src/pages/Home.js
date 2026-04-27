@@ -426,32 +426,19 @@ const Home = () => {
             className={`aw-reveal ${productRevealVisible ? 'aw-reveal-visible' : ''}`.trim()}
           >
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center">
-              <div className="relative mx-auto max-w-md lg:mx-0">
-                <div
-                  className="pointer-events-none absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-zinc-300/25 via-stone-200/20 to-transparent blur-3xl opacity-90"
-                  aria-hidden
-                />
-                <div className="group relative aspect-square overflow-hidden rounded-[1.75rem] bg-gradient-to-b from-white via-stone-50/90 to-stone-100 ring-1 ring-stone-200/90 shadow-[0_1px_0_rgba(255,255,255,0.95)_inset,0_28px_64px_-28px_rgba(0,0,0,0.14),0_0_0_1px_rgba(0,0,0,0.02)] transition-[transform,box-shadow] duration-500 ease-out hover:-translate-y-0.5 hover:shadow-[0_32px_72px_-32px_rgba(0,0,0,0.18)]">
-                  <div
-                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_50%_42%,rgba(255,255,255,0.95),transparent_68%)]"
-                    aria-hidden
-                  />
-                  <div
-                    className="pointer-events-none absolute inset-x-8 bottom-[18%] h-1/4 rounded-[100%] bg-zinc-900/[0.06] blur-2xl"
-                    aria-hidden
-                  />
-                  <p className="relative z-[1] pt-7 sm:pt-8 text-center text-[10px] font-semibold tracking-[0.3em] text-zinc-400">
-                    In-venue receiver
-                  </p>
-                  <div className="relative z-[1] flex h-[calc(100%-4.25rem)] min-h-[200px] items-center justify-center px-8 pb-10 pt-2 sm:px-12">
+              <div className="flex items-center justify-center mx-auto max-w-md lg:mx-0">
+                <div className="w-full max-w-lg">
+                  <div className="relative aspect-square flex items-center justify-center rounded-3xl bg-zinc-50 border border-zinc-100">
                     <ProductPixelReveal
                       src="/Earwing.png"
                       alt={PRODUCT_DISPLAY_NAME}
                       enabled={productRevealVisible}
                       onComplete={onProductPixelsComplete}
-                      imgClassName="w-full max-w-[240px] sm:max-w-[270px] object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.16)] transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                      className="h-full w-full"
+                      imgClassName="w-3/5 h-auto object-contain"
                     />
                   </div>
+                  <p className="text-center text-xs text-zinc-500 mt-4 font-light">{PRODUCT_DISPLAY_NAME}</p>
                 </div>
               </div>
               <div
