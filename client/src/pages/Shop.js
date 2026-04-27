@@ -10,6 +10,10 @@ const SHOP_CTA_HOLD = true;
 
 const Shop = () => {
   const [quantity, setQuantity] = useState(1);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistTouched, setWaitlistTouched] = useState(false);
+  const [waitlistSuccess, setWaitlistSuccess] = useState(false);
   const { addToCart } = useCart();
   const { geoReady } = usePricing();
   const navigate = useNavigate();
@@ -24,6 +28,36 @@ const Shop = () => {
     if (newQuantity >= 1 && newQuantity <= 10) {
       setQuantity(newQuantity);
     }
+  };
+
+  const openWaitlist = () => {
+    setWaitlistOpen(true);
+    setWaitlistTouched(false);
+    setWaitlistSuccess(false);
+  };
+
+  const closeWaitlist = () => {
+    setWaitlistOpen(false);
+    setWaitlistTouched(false);
+    setWaitlistSuccess(false);
+    setWaitlistEmail('');
+  };
+
+  const handlePrimaryAction = () => {
+    if (SHOP_CTA_HOLD) {
+      openWaitlist();
+      return;
+    }
+    handleAddToCart();
+  };
+
+  const handleWaitlistSubmit = (e) => {
+    e.preventDefault();
+    setWaitlistTouched(true);
+    const email = waitlistEmail.trim();
+    if (!email) return;
+    // Launch hold capture: local success state now; wire API later.
+    setWaitlistSuccess(true);
   };
 
   return (
@@ -151,11 +185,11 @@ const Shop = () => {
 
               <button
                 type="button"
-                onClick={handleAddToCart}
-                disabled={SHOP_CTA_HOLD || !geoReady}
+                onClick={handlePrimaryAction}
+                disabled={!SHOP_CTA_HOLD && !geoReady}
                 className="w-full py-3.5 rounded-full bg-zinc-950 text-white text-sm font-medium tracking-wide hover:bg-zinc-800 transition-colors min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {SHOP_CTA_HOLD ? 'Something big is brewing' : 'Add to cart'}
+                {SHOP_CTA_HOLD ? 'Join Waitlist' : 'Add to cart'}
               </button>
 
               <p className="text-center text-xs text-zinc-500 font-light">Secure checkout</p>
@@ -163,6 +197,79 @@ const Shop = () => {
           </div>
         </div>
       </div>
+
+      {waitlistOpen && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/45 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="waitlist-title"
+          onClick={closeWaitlist}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white p-6 sm:p-7 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="waitlist-title" className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900">
+              Get early access to ArenaWav
+            </h2>
+
+            {waitlistSuccess ? (
+              <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                You&apos;re in. We&apos;ll reach out before our first pilot.
+              </div>
+            ) : (
+              <form className="mt-5 space-y-4" onSubmit={handleWaitlistSubmit}>
+                <div>
+                  <label htmlFor="waitlist-email" className="mb-1.5 block text-sm font-medium text-zinc-800">
+                    Email
+                  </label>
+                  <input
+                    id="waitlist-email"
+                    type="email"
+                    required
+                    value={waitlistEmail}
+                    onChange={(e) => setWaitlistEmail(e.target.value)}
+                    className="w-full rounded-xl border border-zinc-300 px-3.5 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-500"
+                    placeholder="you@example.com"
+                  />
+                  {waitlistTouched && !waitlistEmail.trim() && (
+                    <p className="mt-1.5 text-xs text-rose-600">Email is required.</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="waitlist-qty" className="mb-1.5 block text-sm font-medium text-zinc-800">
+                    Qty selected
+                  </label>
+                  <input
+                    id="waitlist-qty"
+                    type="text"
+                    value={String(quantity)}
+                    readOnly
+                    className="w-full rounded-xl border border-zinc-200 bg-zinc-100 px-3.5 py-2.5 text-sm text-zinc-700"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded-full bg-zinc-950 py-3 text-sm font-medium tracking-wide text-white transition-colors hover:bg-zinc-800"
+                >
+                  Join Waitlist
+                </button>
+              </form>
+            )}
+
+            <button
+              type="button"
+              onClick={closeWaitlist}
+              className="mt-4 w-full rounded-full border border-zinc-200 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+            >
+              {waitlistSuccess ? 'Close' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

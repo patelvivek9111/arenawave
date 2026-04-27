@@ -150,6 +150,56 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Geolocation helper endpoint (server-side fetch avoids browser CORS issues).
+app.get('/api/geo/country', async (req, res) => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
+  const getCodeFromJson = (payload, key) => {
+    const value = payload?.[key];
+    if (!value) return null;
+    return String(value).toUpperCase();
+  };
+
+  try {
+    // Primary provider
+    let response = await fetch('https://ipapi.co/json/', {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const countryCode = getCodeFromJson(data, 'country_code');
+      if (countryCode) {
+        clearTimeout(timeout);
+        return res.json({ countryCode, source: 'ipapi' });
+      }
+    }
+
+    // Fallback provider
+    response = await fetch('https://ipwho.is/', {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const countryCode = getCodeFromJson(data, 'country_code');
+      if (countryCode) {
+        clearTimeout(timeout);
+        return res.json({ countryCode, source: 'ipwhois' });
+      }
+    }
+
+    clearTimeout(timeout);
+    return res.json({ countryCode: null, source: 'none' });
+  } catch (error) {
+    clearTimeout(timeout);
+    const isAbort = error?.name === 'AbortError';
+    console.warn('Geo lookup failed:', isAbort ? 'timeout' : error.message);
+    return res.json({ countryCode: null, source: isAbort ? 'timeout' : 'error' });
+  }
+});
+
 // MongoDB connection test endpoint
 app.get('/api/test/mongodb', async (req, res) => {
   try {

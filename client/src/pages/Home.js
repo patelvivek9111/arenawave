@@ -34,10 +34,10 @@ const USE_CASES = [
     alt: 'Narendra Modi Stadium in Ahmedabad during the 2023 Cricket World Cup final, crowd and ground visible',
   },
   {
-    title: 'Live music',
-    tag: 'Tours & festivals',
-    src: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1400&q=82',
-    alt: 'Concert crowd',
+    title: 'Baseball',
+    tag: 'Major League',
+    src: 'https://images.unsplash.com/photo-1508344928928-7165b67de128?auto=format&fit=crop&w=1400&q=82',
+    alt: 'Baseball stadium crowd at a night game',
   },
 ];
 
@@ -512,3 +512,5 @@ const Home = () => {
 };
 
 export default Home;
+
+

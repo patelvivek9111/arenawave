@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { getPricingForCountryCode, formatMoney } from '../config/pricing';
+import { API_BASE_URL } from '../config/api';
 
 const PricingContext = createContext(null);
 
@@ -14,11 +15,13 @@ export function PricingProvider({ children }) {
       try {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 8000);
-        const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        const res = await fetch(`${API_BASE_URL}/api/geo/country`, {
+          signal: controller.signal,
+        });
         clearTimeout(timer);
         if (!res.ok) throw new Error('geo failed');
         const data = await res.json();
-        const code = data?.country_code ? String(data.country_code).toUpperCase() : null;
+        const code = data?.countryCode ? String(data.countryCode).toUpperCase() : null;
         if (!cancelled) setCountryCode(code);
       } catch {
         if (!cancelled) setCountryCode(null);
