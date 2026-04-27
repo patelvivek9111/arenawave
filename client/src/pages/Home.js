@@ -218,9 +218,6 @@ const Home = () => {
                 >
                   Shop Earwing
                 </Link>
-                <p className="text-center text-xs font-medium tracking-wide text-zinc-200 [text-shadow:0_1px_10px_rgba(0,0,0,0.55)] sm:text-left sm:text-sm">
-                  {PRODUCT_DISPLAY_NAME}
-                </p>
               </div>
               {/* Launch hold: restore price next to CTA — usePricing (geoReady, formatPrice, unitPrice), skeleton, and “price · name” row */}
             </div>
